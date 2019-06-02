@@ -4,7 +4,6 @@ import Fire from "../../FIREBASE/FBConfig";
 import { Cookies } from "../Cookies";
 import { Link } from "react-router-dom";
 
-
 class LoginPage extends Component {
     state = {
         userNameStyle: {
@@ -14,11 +13,6 @@ class LoginPage extends Component {
         },
         alert:{ padding: 0 }
     }
-
-
-    // componentDidMount(){
-    //     console.log("object");
-    // }
     
 
     SubmitForm = async(e) =>{
@@ -170,14 +164,14 @@ class LoginPage extends Component {
 
     render() {
         return (
-            <section>
+            <section className="LoginSection">
                 <Link to="/Chat" id="GotoChat"></Link>
 
                 <span id="Alert" style={this.state.alert}></span>
                 <div className="content container">
                     <h3>Welcome to Chatome</h3>
                     
-                    <form onSubmit={(event)=>(this.SubmitForm(event))} className="container d-flex flex-column">
+                    <form onSubmit={(event)=>(this.SubmitForm(event))} className="container d-flex flex-column LoginForm">
                         <div className="avatar">
                             <i className="fas fa-camera"></i> 
                             <img src="../public/img/User.svg" alt="Avatar"  title="Choose your avatar" id="picture"/>
