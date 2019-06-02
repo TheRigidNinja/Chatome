@@ -14,6 +14,7 @@
     "react-with-firebase-auth": "^1.0.3",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
+    "socket.io-client": "^2.2.0",
     "thunk": "0.0.1"
   },
   "scripts": {
