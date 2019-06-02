@@ -1,18 +1,18 @@
 # Chatome
 
-A react chat app With nodejs server and socket.io as a bridge for realtime communication
+A React Chat web-app with Nodejs server and Socket.io as a bridge for realtime communication
 
 
-## ~~ [Live Demo](##) ~~
+### ~~[Live Demo](##)~~
 
 
 
-## How it looks so far 
+### How it looks so far 
 
 
 
 **How to deploy to Heroku!**
-> heroku login <br>
-> heroku git:remote -a chatappe<br>
-> git add .<br>
-> git push heroku master<br>
+<code>heroku login</code> <br>
+<code>heroku git:remote -a chatappe</code><br>
+<code>git add .</code><br>
+<code>git push heroku master</code><br>
