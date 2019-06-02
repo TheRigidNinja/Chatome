@@ -11,8 +11,6 @@ A react chat app With nodejs server and socket.io as a bridge for realtime commu
 
 
 
-
-
 **How to deploy to Heroku!**
 > heroku login <br>
 > heroku git:remote -a chatappe<br>
