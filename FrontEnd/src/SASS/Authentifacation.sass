@@ -1,0 +1,138 @@
+%resetELm
+    position: absolute
+    width: 100%
+    height: 100%
+    margin: 0px
+    padding: 0px
+    left: 0px
+    top: 0px
+
+    
+section 
+    position: relative
+    background: #5a51a5 !important
+
+section:before,section:after
+    height: 500px
+    width: 320px
+    transform: rotate(-60deg)
+    content: ""
+    display: block
+    position: absolute
+    top: -200px
+    background-color: #ee4180
+    border-radius: 5px
+  
+section:before
+    top: calc(100% - 100px)
+
+#Alert
+    transition: all cubic-bezier(.82,.01,.42,.84) .2s
+    @extend %resetELm
+    height: auto
+    background: #202651
+    color: white
+    padding: 0px
+    border-radius: 0px 0px 100px 100px
+    text-align: center
+    z-index: 3
+
+form
+    position: relative
+    z-index: 1
+    background: white
+    border-radius: 5px
+    padding: 20px
+    margin: 20px 0px
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.158)
+
+
+.content
+    position: relative
+    width: 100%
+    height: 100%
+    overflow: hidden
+    overflow-y: scroll
+    -webkit-overflow-scrolling: touch
+    z-index: 2
+    
+
+/* --------------- Avitar Section --------------- */
+%avatarProfile
+    width: 100px
+    height: 100px    
+
+.avatar
+    position: relative
+    @extend %avatarProfile
+    left: calc(50% - 50px)
+    margin-bottom: 20px
+
+img 
+    border-radius: 50%
+    @extend %avatarProfile
+
+.avatar i
+    transform: all 0.2s
+    cursor: pointer
+    position: absolute
+    border-radius: 50%
+    background: white
+    z-index: 1
+    border: 8px solid white
+    font-size: 15px
+    left: 70px
+    top: 70px
+
+
+/* --------------- Input Style --------------- */
+    
+label
+    text-align: start
+    width: 80%
+    margin: 0px
+    padding: 0px
+
+input
+    border: 1px solid rgba(0, 0, 0, 0.13)
+    border-radius: 2px
+    padding: 12px
+    width: 100%
+    // font-size: 10px
+
+input[type="submit"]
+    position: relative
+    width: 100px
+    border-radius: 5px
+    cursor: pointer
+    left: calc(50% - 50px)
+
+input[type="checkbox"]
+    width: 5%
+
+
+
+// Register Toggle 
+.userName
+    transition: all .2s
+
+h3
+    position: relative
+    z-index: 1
+    text-align: center
+    color: white 
+    top: 20px
+    padding: 15px 0px
+    // background: orange
+
+
+/* --------------- Affects --------------- */
+input[type="submit"]:hover
+    color: #ee4180
+
+input:hover
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.082)
+
+input:focus
+    outline: none
+    border: 1px solid #ee4180c5
