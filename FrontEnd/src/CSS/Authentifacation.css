@@ -13,7 +13,7 @@
   background: #5a51a5 !important;
 }
 
-.LoginSection:before, .LoginSection :after {
+.LoginSection:before, .LoginSection:after {
   height: 500px;
   width: 320px;
   -webkit-transform: rotate(-60deg);
@@ -21,13 +21,13 @@
   content: "";
   display: block;
   position: absolute;
-  top: -200px;
+  top: -250px;
   background-color: #ee4180;
   border-radius: 5px;
 }
 
 .LoginSection:before {
-  top: calc(100% - 100px);
+  top: calc(100% - 150px);
 }
 
 #Alert {
