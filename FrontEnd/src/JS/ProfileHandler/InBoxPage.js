@@ -4,7 +4,7 @@ import "../../CSS/Friends.css";
 import Fire from "../../FIREBASE/FBConfig";
 import { Cookies } from "../Cookies";
 import { Socket } from "../Socket";
-import { connect } from "redux";
+import { connect } from "react-redux";
 import Messaging from "../MessageHandler/MessagingArea";
 import InboxPeople from "./InboxPeople";
 import FriendsSection from "./FriendsSection";
@@ -21,10 +21,17 @@ class ProfilePage extends Component {
         }
     }
 
-    // componentDidMount(){
-    //     console.log(Socket().emit("--"));
-    //     // Socket.emit("first");  
-    // }
+    componentDidMount(){
+
+        let Userdetails = this.props.yourDetails;
+        
+        if(Object.keys(Userdetails).length != 0){
+            Socket().emit("GetAllProfileData","Userdetails","1234"); 
+        }
+
+    }
+
+
 
 
     TogglePage =(PageType)=>{
@@ -125,6 +132,14 @@ class ProfilePage extends Component {
     }
 }
 
+const mapDispatchToProps = (dispatch) => {
+    return 0
+}
 
+const mapStateToProps = (state) => {
+    return {
+        yourDetails:{...state.ProfileDB}
+    }
+}
 
-export default ProfilePage;
+export default connect(mapStateToProps,mapDispatchToProps)(ProfilePage);

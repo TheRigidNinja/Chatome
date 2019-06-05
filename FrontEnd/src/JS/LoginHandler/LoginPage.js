@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import "../../CSS/Authentifacation.css";
 import Fire from "../../FIREBASE/FBConfig";
-import { Cookies } from "../Cookies";
 import { Link } from "react-router-dom";
+import { connect } from "react-redux"
 
 class LoginPage extends Component {
     state = {
@@ -39,8 +39,8 @@ class LoginPage extends Component {
             
             // Changes page IF user successfully Logs or register 
             if(returnLogs.alertMsg === "Success"){
-                Cookies("SET",{name:"userInfo",value:JSON.stringify(returnLogs)});
-                document.getElementById("GotoChat").click()
+                this.props.yourDetails(returnLogs); // Set to props
+                document.getElementById("GotoChat").click();
             }
         }
 
@@ -184,17 +184,17 @@ class LoginPage extends Component {
 
                         <div className="form-group userName" style={this.state.userNameStyle}> 
                             <label>*User Name</label>
-                            <input type="text" placeholder="e.i: Smaff56" id="userLabel" />
+                            <input type="text" placeholder="e.i: Smaff56" id="userLabel" defaultValue={"user56"}/>
                         </div>
 
                         <div className="form-group"> 
                             <label>*Email</label>
-                            <input type="email" placeholder="e.i: example@gmail.com" id="email" required/>
+                            <input type="email" placeholder="e.i: example@gmail.com" id="email" required defaultValue={"brian.shisanya2000@gmail.com"}/>
                         </div> 
 
                         <div className="form-group"> 
                             <label>*Password </label>
-                            <input type="password" id="password" required/>
+                            <input type="password" id="password" required defaultValue={123456}/>
                         </div>
             
                         <input type="submit" id="Submit"/>
@@ -205,5 +205,10 @@ class LoginPage extends Component {
     }
 }
 
+const mapDispatchToProps = (dispatch) => {
+    return {
+        yourDetails: (stutas) => { dispatch({ type: 'UPDATE', data: stutas }) }
+    }
+}
 
-export default LoginPage
+export default connect(null,mapDispatchToProps)(LoginPage);
