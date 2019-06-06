@@ -3,15 +3,16 @@ import "../../CSS/Messaging.css";
 import Chats from "./Chats";
 
 
-function MessagingArea() {
+function MessagingArea({style,TogglePage,recipientData}) {
+    // console.log(recipientData);
     return (
-            <div className="MessagingArea">    
+            <div className="MessagingArea" style={style}>    
                 <div className="Header">
-                    <i className="fas fa-chevron-left" onClick={0}></i>
+                    <i className="fas fa-chevron-left" onClick={()=>TogglePage("BackToInbox")}></i>
                     <div className="MSGheader1">
-                        <img src="../public/Img/User.svg" alt="User"/>
+                        <img src={recipientData.picture} alt="User"/>
                         <div>
-                            <span>---</span>
+                            <span>{recipientData.userName}</span>
                             <time>----</time>
                         </div>
                     </div>

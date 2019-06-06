@@ -2,213 +2,241 @@ import React, { Component } from "react";
 import "../../CSS/Authentifacation.css";
 import Fire from "../../FIREBASE/FBConfig";
 import { Link } from "react-router-dom";
-import { connect } from "react-redux"
+import { connect } from "react-redux";
+import ProfilePic from "./ProfilePic";
 
 class LoginPage extends Component {
-    state = {
+  state = {
+    userNameStyle: {
+      display: "none",
+      opacity: 0,
+      height: 0
+    },
+    alert: { padding: 0 }
+  };
+
+  SubmitForm = async e => {
+    e.preventDefault();
+
+    var elms = document.querySelectorAll(
+        "#check1, #picture, #userLabel, #email, #password"
+      ),
+      returnLogs = null,
+      source = elms[0].src.toString(),
+      userLoginData = {
+        picture: "../" + source.slice(source.indexOf("public")),
+        newCustomer: elms[1].checked,
+        userName: elms[2].value,
+        email: elms[3].value,
+        password: elms[4].value
+      };
+
+    // Validates Form Data and checks if everything is correct
+    if (this.ValidateFormData(userLoginData)) {
+      if (userLoginData.newCustomer === true) {
+        returnLogs = await this.RegisterHandler(userLoginData);
+      } else {
+        returnLogs = await this.LoginHandler(userLoginData);
+      }
+
+      // Changes page IF user successfully Login or registers
+      if (["Login", "Register"].includes(returnLogs.checkInType)) {
+        this.props.yourDetails(returnLogs); // Set to props
+        document.getElementById("GotoChat").click();
+      }
+    }
+  };
+
+  RegisterBox = () => {
+    var dom = document.querySelectorAll(".userName, #userLabel"),
+      userName = dom[0],
+      userLabel = dom[1];
+
+    if (userName.offsetHeight === 0) {
+      userLabel.removeAttribute("required");
+
+      this.setState({
         userNameStyle: {
-            display: "none",
-            opacity: 0,
-            height: 0 
-        },
-        alert:{ padding: 0 }
-    }
-    
-
-    SubmitForm = async(e) =>{
-        e.preventDefault();
-
-        let elms = document.querySelectorAll("#check1, #picture, #userLabel, #email, #password"),          returnLogs = null,
-            source = elms[0].src.toString(),
-            userLoginData = {
-                picture: "../"+source.slice(source.indexOf("public")),
-                newCustomer: elms[1].checked,
-                userName: elms[2].value,
-                email: elms[3].value,
-                password: elms[4].value,            
-            };
-            
-        // Validates Form Data and checks if everything is correct
-        if(this.ValidateFormData(userLoginData)){
-
-            if(userLoginData.newCustomer === true){
-                returnLogs = await this.RegisterHandler(userLoginData);
-            }else{
-                returnLogs = await this.LoginHandler(userLoginData);
-            }
-            
-            // Changes page IF user successfully Logs or register 
-            if(returnLogs.alertMsg === "Success"){
-                this.props.yourDetails(returnLogs); // Set to props
-                document.getElementById("GotoChat").click();
-            }
+          display: "block",
+          opacity: 1,
+          height: 70
         }
+      });
+    } else {
+      userLabel.removeAttribute("required");
+      // var promise = new Promise((resolve)=>{
+      //     setTimeout(()=>{resolve("none")},1000)
+      // })
 
-    }
-
-    RegisterBox = () =>{
-        var dom = document.querySelectorAll(".userName, #userLabel"),
-            userName = dom[0],
-            userLabel = dom[1];
-
-        if(userName.offsetHeight === 0){
-            userLabel.removeAttribute("required");
-
-            this.setState({
-                userNameStyle:{
-                    display: "block",
-                    opacity: 1,
-                    height: 70 
-                }
-            })
-        }else{
-            userLabel.removeAttribute("required");
-            // var promise = new Promise((resolve)=>{
-            //     setTimeout(()=>{resolve("none")},1000)
-            // })
-
-            this.setState({
-                userNameStyle:{
-                    opacity: 0,
-                    height: 0,
-                    display: "none",
-                }
-            })
+      this.setState({
+        userNameStyle: {
+          opacity: 0,
+          height: 0,
+          display: "none"
         }
+      });
+    }
+  };
+
+  //-----------------//   Registration Section
+  RegisterHandler = userLoginData => {
+    return Fire.auth()
+      .createUserWithEmailAndPassword(
+        userLoginData.email,
+        userLoginData.password
+      )
+      .then(userInfo => {
+        delete userLoginData.email;
+        delete userLoginData.password;
+        delete userLoginData.newCustomer;
+
+        const timeStamp = Date.parse(new Date()),
+          userFormInfo = {
+            ID:null,
+            uuID: userInfo.user.uid,
+            ...userLoginData,
+            status: "Online",
+            checkInType: "Register",
+            messageKey: (Math.random() * 1000).toString(16).substring(),
+            phoneUpdate: timeStamp,
+            accountCreatedDATE: timeStamp,
+            emailUpdate: timeStamp,
+            pictureUpdate: timeStamp
+          };
+
+        return userFormInfo;
+      })
+      .catch(error => {
+        return this.WarningHandler(error.message);
+      });
+  };
+
+  //-----------------//   Login Section
+  LoginHandler = userLoginData => {
+    return Fire.auth()
+      .signInWithEmailAndPassword(userLoginData.email, userLoginData.password)
+      .then(async userInfo => {
+        return { uuID: userInfo.user.uid, checkInType: "Login" };
+      })
+      .catch(error => {
+        return this.WarningHandler(error.message);
+      });
+  };
+
+  // Checks if everything is correct in the form before submiting
+  ValidateFormData = formData => {
+    var warnings = "";
+
+    if (formData.password.replace(" ", "").length < 6) {
+      warnings += "Password must be > 6 char|";
     }
 
-    RegisterHandler = (userLoginData) =>{
-        return(
-            Fire.auth().createUserWithEmailAndPassword(userLoginData.email, userLoginData.password).then((userInfo) => {
-                
-                delete userLoginData.email;
-                delete userLoginData.password;
-
-                const db = Fire.firestore(),
-                      msgKey = (Math.random()*1000).toString(16).substring(),
-                      userFormInfo = {
-                            ...userLoginData,
-                            state: "Online",
-                            alertMsg: "Success",
-                            userId: userInfo.user.uid,
-                            msgKey: msgKey
-                        };
-
-                db.collection("All_Users").doc(userInfo.user.uid).set({...userFormInfo});
-
-                return userFormInfo
-
-            }).catch((error) =>{
-                return this.WarningHandler(error.message);
-            })
-        )
+    if (formData.newCustomer === true && formData.userName.length < 4) {
+      warnings += "User Name must be > 4 char|";
     }
 
-    LoginHandler = (userLoginData) =>{
-        return(
-            Fire.auth().signInWithEmailAndPassword(userLoginData.email, userLoginData.password).then(async(userInfo) => {
-
-                const db = Fire.firestore(),
-                userProfileData = await db.collection("All_Users").doc(userInfo.user.uid).get().then((snapshot) => {return snapshot.data()});
-
-                return userProfileData
-
-            }).catch((error) => {
-                return this.WarningHandler(error.message);
-            })
-        )
+    // Showing warnings to the user
+    if (warnings !== "") {
+      return this.WarningHandler(warnings);
+    } else {
+      return true;
     }
+  };
 
+  WarningHandler = data => {
+    let alert = document.getElementById("Alert");
+    alert.innerText = data.replace(/\|/g, "\n");
 
-// Checks if everything is correct in the form before submiting
-    ValidateFormData = (formData) =>{
-        var warnings = "";
+    this.setState({
+      alert: { padding: 20 }
+    });
 
-        if (formData.password.replace(" ", "").length < 6){
-            warnings+="Password must be > 6 char|";
-        } 
+    // Warning timeout
+    setTimeout(() => {
+      alert.innerText = "";
+      this.setState({
+        alert: { padding: 0 }
+      });
+    }, 5000);
 
-        if (formData.newCustomer === true && formData.userName.length < 4){
-            warnings+="User Name must be > 4 char|";
-        } 
-        
-        // Showing warnings to the user
-        if(warnings !== ""){
-            return this.WarningHandler(warnings);
-        }else{
-            return true
-        }
-    }
+    return false;
+  };
 
+  render() {
+    return (
+      <section className="LoginSection">
+        <Link to="/Chat" id="GotoChat" />
 
-    WarningHandler = (data) =>{
+        <span id="Alert" style={this.state.alert} />
+        <div className="content container">
+          <h3>Welcome to Chatome</h3>
 
-        let alert = document.getElementById("Alert");
-        alert.innerText = data.replace(/\|/g,"\n");
+          <form
+            onSubmit={event => this.SubmitForm(event)}
+            className="container d-flex flex-column LoginForm"
+          >
+            <div className="avatar">
+              <ProfilePic />
+            </div>
 
-        this.setState({
-            alert:{ padding: 20}
-        })
+            <div className="form-group">
+              <input type="checkbox" onChange={this.RegisterBox} id="check1" />
+              <label className="form-check-label" htmlFor="check1">
+                - I'm new to this!!!
+              </label>
+            </div>
 
-        // Warning timeout
-        setTimeout(() => {
-            alert.innerText = "";
-            this.setState({
-                alert:{ padding: 0}
-            })
-        }, 5000);
+            <div
+              className="form-group userName"
+              style={this.state.userNameStyle}
+            >
+              <label>*User Name</label>
+              <input
+                type="text"
+                placeholder="e.i: Smaff56"
+                id="userLabel"
+                defaultValue={"user56"}
+              />
+            </div>
 
-        return false
-    }
+            <div className="form-group">
+              <label>*Email</label>
+              <input
+                type="email"
+                placeholder="e.i: example@gmail.com"
+                id="email"
+                required
+                defaultValue={"brian.shisanya2000@gmail.com"}
+              />
+            </div>
 
+            <div className="form-group">
+              <label>*Password </label>
+              <input
+                type="password"
+                id="password"
+                required
+                defaultValue={123456}
+              />
+            </div>
 
-    render() {
-        return (
-            <section className="LoginSection">
-                <Link to="/Chat" id="GotoChat"></Link>
-
-                <span id="Alert" style={this.state.alert}></span>
-                <div className="content container">
-                    <h3>Welcome to Chatome</h3>
-                    
-                    <form onSubmit={(event)=>(this.SubmitForm(event))} className="container d-flex flex-column LoginForm">
-                        <div className="avatar">
-                            <i className="fas fa-camera"></i> 
-                            <img src="../public/img/User.svg" alt="Avatar"  title="Choose your avatar" id="picture"/>
-                        </div>
-
-                        <div className="form-group">
-                            <input type="checkbox" onChange={this.RegisterBox} id="check1"/>
-                            <label className="form-check-label" htmlFor="check1">- I'm new to this!!!</label>
-                        </div>
-
-                        <div className="form-group userName" style={this.state.userNameStyle}> 
-                            <label>*User Name</label>
-                            <input type="text" placeholder="e.i: Smaff56" id="userLabel" defaultValue={"user56"}/>
-                        </div>
-
-                        <div className="form-group"> 
-                            <label>*Email</label>
-                            <input type="email" placeholder="e.i: example@gmail.com" id="email" required defaultValue={"brian.shisanya2000@gmail.com"}/>
-                        </div> 
-
-                        <div className="form-group"> 
-                            <label>*Password </label>
-                            <input type="password" id="password" required defaultValue={123456}/>
-                        </div>
-            
-                        <input type="submit" id="Submit"/>
-                    </form>
-                </div>
-            </section>
-        )
-    }
+            <input type="submit" id="Submit" />
+          </form>
+        </div>
+      </section>
+    );
+  }
 }
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        yourDetails: (stutas) => { dispatch({ type: 'UPDATE', data: stutas }) }
+const mapDispatchToProps = dispatch => {
+  return {
+    yourDetails: stutas => {
+      dispatch({ type: "UPDATE", data: stutas });
     }
-}
+  };
+};
 
-export default connect(null,mapDispatchToProps)(LoginPage);
+export default connect(
+  null,
+  mapDispatchToProps
+)(LoginPage);
