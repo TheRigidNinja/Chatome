@@ -1,32 +1,57 @@
-import React from 'react'
+import React from "react";
 
-export default function InboxPeople({peopleData,TogglePage}) {
+export default function InboxPeople({
+  peopleData,
+  TogglePage,
+  myData,
+  LatestChats
+}) {
+  var msgCnt = -1,
+  chats = null,
+  timeStamp = null;
 
-    const People = ()=>{
-        var arryCnt = 0;
 
-        return(
-        peopleData.map(data => {
-        return(
-        <>
-          <div className="Person" messageKey={data.ID} onClick={()=>TogglePage("Messaging",data.ID)}>
-            <span id="ProfilePic">
-              <img src={data.picture} alt="IMG" />
-              <span id="status" />
-            </span>
-            <div className="details">
-              <h4>{data.userName}</h4>
-              <p>---</p>
+  const People = () => {
+    return peopleData.map(data => {
+      if (!(data.ID === myData)) {
+
+        if((typeof LatestChats) === "object"){
+          msgCnt++;
+
+          var objKeys = Object.keys(LatestChats[msgCnt]);
+
+
+          timeStamp = LatestChats[msgCnt].timeStamp;
+          chats = LatestChats[msgCnt][objKeys[0]];
+
+          console.log(chats);
+          // chats = LatestChats[msgCnt]?LatestChats[msgCnt]:"";
+        }
+
+        return (
+          <>
+            <div
+              className="Person"
+              messageKey={data.messageKey}
+              onClick={() => TogglePage("Messaging", data.ID - 1)}
+            >
+              <span id="ProfilePic">
+                <img src={data.picture} alt="IMG" />
+                <span id="status" />
+              </span>
+              <div className="details">
+                <h4>{data.userName}</h4>
+                <p>{chats}</p>
+              </div>
+              <time>{timeStamp}</time>
             </div>
-            <time>8:40pm</time>
-          </div>
-        </>  
-        )
-    }))}
+          </>
+        );
+      } else {
+        return <></>;
+      }
+    });
+  };
 
-    // console.log(People);
-
-
-    return <People/>
+  return <People />;
 }
-

@@ -1,9 +1,9 @@
 .RegisterPic {
   position: absolute;
   z-index: 2;
-  left: -100px;
   width: 300px;
   height: 300px;
+  top: -130px;
   border-radius: 50%;
   -webkit-box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.4);
           box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.4);

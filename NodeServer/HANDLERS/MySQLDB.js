@@ -1,71 +1,80 @@
 const mysql = require("mysql"),
-  config = {
-    host: "localhost",
-    port: 8889,
-    user: "root",
-    password: "1234"
-  };
+  config = require("./ConfigFile")();
 
-async function DataTomySQL(data) {
+async function DataTomySQL(data, dbType) {
   // Seperate OBJ keys and values to strings
   var keysWithType = [],
     keysNoType = [],
     values = [],
     sql = [];
 
+    console.log(data)
   for (let elm in data) {
-    var elmType = (() => {
-      switch (true) {
-        case [
-          "phoneUpdate",
-          "accountCreatedDATE",
-          "emailUpdate",
-          "pictureUpdate",
-          "messageKey"
-        ].includes(elm):
-          return " VARCHAR(20) NOT NULL";
-        case [
-          "uuID",
-          "status",
-          "checkInType",
-          "messageKey",
-          "userName"
-        ].includes(elm):
-          return " TEXT NOT NULL";
-        case "picture" === elm:
-          return " TEXT NOT NULL"; //LONGBLOB NOT NULL
-        case "ID" === elm:
-          return " INT PRIMARY KEY AUTO_INCREMENT";
-      }
-    })();
+    if (elm !== "checkInType") {
+      var elmType = (() => {
+        switch (true) {
+          case [
+            "phoneUpdate",
+            "accountCreatedDATE",
+            "emailUpdate",
+            "pictureUpdate",
+            "status"
+          ].includes(elm):
+            return " VARCHAR(20) NOT NULL";
+          case [
+            "uuID",
+            "userName",
+            "messageKey",
+            "message",
+            "name",
+            "timeStamp"
+          ].includes(elm):
+            return " TEXT NOT NULL ";
+          case "picture" === elm:
+            return " LONGBLOB NOT NULL";
+          case "ID" === elm:
+            return " INT PRIMARY KEY AUTO_INCREMENT";
+        }
+      })();
 
-    keysWithType.push(elm + elmType);
-    keysNoType.push(elm);
-    values.push(data[elm]);
+      keysWithType.push(elm + elmType);
+      keysNoType.push(elm);
+      values.push(data[elm]);
+    }
   }
 
-  keysWithType = keysWithType.toString();
+
   keysNoType = keysNoType.toString();
 
   switch (data.checkInType) {
     case "Register":
       sql.push(
-        "CREATE DATABASE IF NOT EXISTS ProfileData",
-        "CREATE TABLE IF NOT EXISTS PublicUserData (" + keysWithType + ")",
-        "INSERT INTO PublicUserData (" + keysNoType + ") VALUES ?"
+        "CREATE DATABASE IF NOT EXISTS " + dbType.db,
+        "CREATE TABLE IF NOT EXISTS " +
+          dbType.dbTable +
+          " (" +
+          keysWithType +
+          ")",
+        "INSERT INTO " + dbType.dbTable + " (" + keysNoType + ") VALUES ?"
       );
       break;
 
     case "Login":
-      sql.push("SELECT *, NULL AS uuID FROM PublicUserData");
+      sql.push("SELECT *, NULL AS uuID FROM " + dbType.dbTable + "");
       break;
 
-    case "myData":
+    case "MyData":
       sql.push(
-        "SELECT *, NULL AS uuID FROM PublicUserData WHERE uuID='" +
-          data.uuID +
-          "'"
+        "SELECT ID FROM " + dbType.dbTable + " WHERE uuID='" + data.uuID + "'"
       );
+      break;
+
+    case "Chats":
+      sql.push("SELECT * FROM " + dbType.dbTable+" ORDER BY timeStamp ASC");
+      break;
+
+    case "Friends":
+      sql.push("SELECT * FROM " + data.uuID);
       break;
 
     default:
@@ -73,84 +82,89 @@ async function DataTomySQL(data) {
   }
 
   // Interacting with mySQL DataBase!
+  var promise1, promise2, promise3, promise4, connect;
 
-  var promise1, promise2, promise3, connect;
-
-  // if (["Login", "myData"].includes(data.checkInType)) {
-  //   connect = mysql.createConnection({
-  //     ...config,
-  //     database: "ProfileData"
-  //   });
-  // }
-
-  console.log(data.checkInType);
   sql.forEach(elm => {
-    // console.log(elm)
     switch (true) {
       // Write data to Database when registering
       case /DATABASE/g.test(elm) && data.checkInType === "Register":
-        connect = mysql.createConnection({ ...config });
-
         promise1 = new Promise((resolve, reject) => {
+          connect = mysql.createConnection({ ...config });
+
           connect.query(elm, (err, result) => {
             if (err) reject(["Error CreatingDB ---->", err]);
-            resolve("Done!");
+            resolve(["Done! Creating DB", result]);
           });
+
+          connect.end();
+        }).catch(err => {
+          console.log("--> Promise erro", err);
         });
-        console.log(">",elm);
         break;
 
       // Works only to insert data in the after making it above Database
       case /TABLE/g.test(elm):
-        connect = mysql.createConnection({
-          ...config,
-          database: "ProfileData"
-        });
-
-        console.log(">",elm);
         promise2 = new Promise((resolve, reject) => {
-          connect.query(elm,(err, result) => {
-            if (err) reject(["Error Creating TABLE ---->", err]);
-            resolve("Done!");
-          });
+          setTimeout(() => {
+            connect = mysql.createConnection({
+              ...config,
+              database: dbType.db
+            });
+
+            connect.query(elm, (err, result) => {
+              if (err) reject(["Error Creating TABLE ---->", err]);
+              resolve("Done! Creating Table");
+            });
+
+            connect.end();
+          }, 10);
+        }).catch(err => {
+          console.log("--> Promise erro", err);
         });
         break;
 
       case /INSERT INTO/g.test(elm):
-        console.log(">",elm);
-        
-        connect = mysql.createConnection({
-          ...config,
-          database: "ProfileData"
+        promise3 = new Promise((resolve, reject) => {
+          setTimeout(() => {
+            connect = mysql.createConnection({
+              ...config,
+              database: dbType.db
+            });
+
+            connect.query(elm, [[values]], (err, result) => {
+              if (err) reject(["Error Inserting VALUES ---->", err]);
+              resolve("Done! Inserting Values");
+            });
+            connect.end();
+          }, 10);
+        }).catch(err => {
+          console.log("--> Promise erro", err);
         });
 
-        promise2 = new Promise((resolve, reject) => {
-          connect.query(elm, [[values]], (err, result) => {
-            if (err) reject(["Error Inserting VALUES ---->", err]);
-            resolve("Done!");
-          });
-        });
         break;
 
       // Handles Login data retrieval from Database
-      case ["Login", "myData"].includes(data.checkInType):
-        console.log(">","Getting data");
-        connect = mysql.createConnection({
-          ...config,
-          database: "ProfileData"
-        });
-  
-        promise3 = new Promise((resolve, reject) => {
+      case ["Login", "MyData", "Chats", "Friends"].includes(data.checkInType):
+        promise4 = new Promise((resolve, reject) => {
+          connect = mysql.createConnection({
+            ...config,
+            database: dbType.db
+          });
+
           connect.query(elm, (err, result) => {
-            if (err) reject(["Error Inserting values to table ---->", err]);
+            if (err) reject(["Error selecting values to table ---->", err]);
             resolve(result);
           });
+
+          connect.end();
+        }).catch(err => {
+          console.log("--> Promise erro", err);
         });
         break;
     }
   });
 
-  return Promise.all([promise1, promise2, promise3]);
+  return Promise.all([promise1, promise2, promise3, promise4]);
 }
 
 module.exports = {

@@ -2,53 +2,69 @@ const express = require("express"),
   app = express(),
   http = require("http").Server(app),
   io = require("socket.io")(http),
-  mySqlDB = require("./HANDLERS/MySQLDB");
+  profile = require("./HANDLERS/serveProfile"),
+  messaging = require("./HANDLERS/ServeMessaging");
 
-io.on("connection", async function(socket) {
+io.on("connection", (socket) =>{
+  
   // Getting All Profile data for all users
   socket.on("GetAllProfileData", async (res, key) => {
-    var dataRetrieval = { profile: null, myData: null, dbCreate: null };
+    
+    var profileDataRetrieval = await profile.serveProfile(res);
 
-    // Writes data to dB
-    if (res.checkInType === "Register") {
-      dataRetrieval.dbCreate = await mySqlDB.DataTomySQL(res);
-    }
+    // Emits back to client all profile data from all users
+    io.emit("AllProfileData", profileDataRetrieval, key);
 
-    console.log(dataRetrieval.dbCreate)
-
-    // Gets data from DB
-    if (dataRetrieval.dbCreate === null || dataRetrieval.dbCreate[1] === "Done!") {
-      res.checkInType = "Login";
-      dataRetrieval.profile = await mySqlDB.DataTomySQL(res);
-
-      res.checkInType = "myData";
-      dataRetrieval.myData = await mySqlDB.DataTomySQL(res);
-    }
-
-    console.log(dataRetrieval);
-
-    io.emit("AllProfileData", dataRetrieval, key);
   });
+
+  // Handles getting individual accounts MSG from DataBase
+  socket.on("GetMessages", async (res, key) => {
+    var msgData = await messaging.serverMessaging(res);
+    io.emit("MSGChannel", msgData, key);
+  });
+
+  // Write MSG to DataBase
+  socket.on("SendMessage", async (res, key) => {
+    var sendMSG = await messaging.sendMessage(res,key);
+
+    io.emit("MessageStatus", sendMSG, key);
+  });
+
+
+  // socket.on('disconnect',(res)=> {
+  //     console.log(res);
+  // });
+
 });
 
+
+// const mySqlDB = require("./HANDLERS/MySQLDB");
 // (async () => {
 //   var resLogin = { uuID: "8ADuY8NxkSd3MaqT3WM72ZEpznN2", checkInType: "Login" };
 //   var resRegister = {
-//   uuID: 'AI5QLJJJnNVbK1OTzgfvxKblaX62',
-//   picture: '../public/img/User.svg',
-//   userName: 'user56',
-//   status: 'Online',
-//   ID:null,
-//   checkInType: 'Register',
-//   messageKey: '29b.9e9ad4aaeea',
-//   phoneUpdate: 1559710329000,
-//   accountCreatedDATE: 1559710329000,
-//   emailUpdate: 1559710329000,
-//   pictureUpdate: 1559710329000
-// }
+//     uuID: "AI5QLJJJnNVbK1OTzgfvxKblaX62",
+//     picture: "../public/img/User.svg",
+//     userName: "user56",
+//     status: "Online",
+//     ID: null,
+//     checkInType: "Register",
+//     messageKey: "29b.9e9ad4aaeea",
+//     phoneUpdate: 1559710329000,
+//     accountCreatedDATE: 1559710329000,
+//     emailUpdate: 1559710329000,
+//     pictureUpdate: 1559710329000
+//   };
 
-//   console.log(await mySqlDB.DataTomySQL(resLogin));
-// })();
+//   var res = {
+//       msg: "Hello",
+//       checkInType: "Chats",
+//       messageKey: "2ee.31466e7a912ee.31466e7a91",
+//       name: "TheRigidNinja",
+//       timeStamp: 1559907165000
+//     },
+//     dbType = { db: "TestingDB", dbTable: "Test1" };
+//   console.log(await mySqlDB.DataTomySQL(resRegister, dbType));
+// })//();
 
 // ---- // Middleware
 // app.get("/users",(req,res)=>{res.render("Inbox")});

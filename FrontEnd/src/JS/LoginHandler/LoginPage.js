@@ -64,9 +64,6 @@ class LoginPage extends Component {
       });
     } else {
       userLabel.removeAttribute("required");
-      // var promise = new Promise((resolve)=>{
-      //     setTimeout(()=>{resolve("none")},1000)
-      // })
 
       this.setState({
         userNameStyle: {
@@ -92,12 +89,12 @@ class LoginPage extends Component {
 
         const timeStamp = Date.parse(new Date()),
           userFormInfo = {
-            ID:null,
+            ID: null,
             uuID: userInfo.user.uid,
             ...userLoginData,
             status: "Online",
             checkInType: "Register",
-            messageKey: (Math.random() * 1000).toString(16).substring(),
+            messageKey: ((Math.random() * 1000).toString(16).substring()).replace(/[.]/g, ""),
             phoneUpdate: timeStamp,
             accountCreatedDATE: timeStamp,
             emailUpdate: timeStamp,
@@ -143,6 +140,7 @@ class LoginPage extends Component {
     }
   };
 
+  //-----// Alert box handler
   WarningHandler = data => {
     let alert = document.getElementById("Alert");
     alert.innerText = data.replace(/\|/g, "\n");
