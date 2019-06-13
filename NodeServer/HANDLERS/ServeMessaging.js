@@ -4,7 +4,6 @@ var msgKeyStore = {},
   MSGChannel = {};
 
 async function serverMessaging(clientsData) {
-  
   // Gets all the Massage keys for all your friends
   if (clientsData.checkInType === "Friends") {
     var dbType = { db: "Friends", dbTable: clientsData.uuID },
@@ -21,7 +20,6 @@ async function serverMessaging(clientsData) {
     });
   }
 
-
   // Gets the chats messaging Data using Massage Keys
   for (let key in msgKeyStore[clientsData.uuID]) {
     key = msgKeyStore[clientsData.uuID][key];
@@ -30,7 +28,7 @@ async function serverMessaging(clientsData) {
     clientsData.checkInType = "Chats";
     msgData = (await mySqlDB.DataTomySQL(clientsData, dbType))[3];
 
-    // // Creates key in MSGChannel if not exists
+    // Creates key in MSGChannel if not exists
     // if (!MSGChannel[key]) {
     //   MSGChannel[key] = [];
     // }
@@ -44,45 +42,71 @@ async function serverMessaging(clientsData) {
     });
   }
 
-  return MSGChannel;
+  // If you have friends it will return an array of them else
+  if (Object.keys(MSGChannel) == "undefined") {
+    return "You Don't Have Friends!!";
+  } else {
+    delete MSGChannel.undefined;
+    return MSGChannel;
+  }
 }
 
 // Setting messages in the DB
 async function sendMessage(clientsData, key) {
-  var tempKey = clientsData.messageKey.split("|"),
-    key1 =tempKey[0] + tempKey[1],
-    key2 = tempKey[1] + tempKey[0];
+  var messageKey = clientsData.messageKey,
+    uuID = clientsData.uuID;
 
-  clientsData.messageKey = key1;
-  clientsData.checkInType = "Chats";
-  var dbType = { db: "MSGChannel", dbTable: clientsData.messageKey },
-    msgData = (await mySqlDB.DataTomySQL(clientsData, dbType))[3];
+  delete clientsData.messageKey;
+  delete clientsData.uuID;
+  // delete clientsData.uuID
 
-  //  Gettign the right key
-  if (!msgData) {
-    clientsData.messageKey = key2;
+  //  Checks to see if the " messageKey " exist in MSGChannel MSQL table
+  // If yes then use that particular key so the people you talk to can
+  // See what you have messaged them
+
+  // " /[|]/g.test " Checks to see if we have | meaning its a new connection
+  if (/[|]/g.test(messageKey)) {
+    var tempKey = messageKey.split("|"),
+      key1 = tempKey[0] + tempKey[1],
+      key2 = tempKey[1] + tempKey[0];
+    messageKey = key1;
+
+    clientsData.checkInType = "Chats";
+    var dbType = { db: "MSGChannel", dbTable: messageKey },
+      msgData = (await mySqlDB.DataTomySQL(clientsData, dbType))[3];
+
+    //  Gettign the right key
+    if (!msgData) {
+      messageKey = key2;
+    }
   }
 
   clientsData.checkInType = "Register";
-  var dbType = { db: "MSGChannel", dbTable: clientsData.messageKey },
+  var dbType = { db: "MSGChannel", dbTable: messageKey },
     sendMSG = await mySqlDB.DataTomySQL(clientsData, dbType);
 
   // Establishing friends in the DB
-  if (!(msgKeyStore[key] && msgKeyStore[key].includes(clientsData.messageKey))) {
+  var msgKeyExists = false;
+  try {
+    msgKeyExists = msgKeyStore[key].includes(messageKey)?false:true;
+  } catch (error) {
+    msgKeyExists = true
+  }
 
+  if (msgKeyExists) {
+    console.log("Now firends!!!!! !!!")
     var dbType = { db: "Friends", dbTable: key };
     mySqlDB.DataTomySQL(
-      { messageKey: clientsData.messageKey, checkInType: "Register" },
+      { messageKey: messageKey, checkInType: "Register" },
       dbType
     );
 
     // Inserts new friend to msgKeyStore list to prevent this statement from inserting same values in DB
     msgKeyStore[key] = [];
-    msgKeyStore[key].push(clientsData.messageKey)
+    msgKeyStore[key].push(messageKey);
   }
 
-  console.log("======>",msgKeyStore);
-  return sendMSG;
+  return { sendMSG, messageKey };
 }
 
 module.exports = {

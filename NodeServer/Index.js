@@ -5,38 +5,52 @@ const express = require("express"),
   profile = require("./HANDLERS/serveProfile"),
   messaging = require("./HANDLERS/ServeMessaging");
 
-io.on("connection", (socket) =>{
-  
+io.on("connection", socket => {
   // Getting All Profile data for all users
   socket.on("GetAllProfileData", async (res, key) => {
-    
     var profileDataRetrieval = await profile.serveProfile(res);
 
     // Emits back to client all profile data from all users
     io.emit("AllProfileData", profileDataRetrieval, key);
-
   });
 
   // Handles getting individual accounts MSG from DataBase
   socket.on("GetMessages", async (res, key) => {
     var msgData = await messaging.serverMessaging(res);
+
     io.emit("MSGChannel", msgData, key);
   });
 
   // Write MSG to DataBase
   socket.on("SendMessage", async (res, key) => {
-    var sendMSG = await messaging.sendMessage(res,key);
+    var msg = {
+      [res.messageKey]: [{ [res.name]: res.message, timeStamp: String(res.timeStamp) }]
+    },
+    checkInDB = /[|]/g.test(res.messageKey);
+    
+    if(checkInDB == false){
+      io.emit("MSGChannel", msg, key,"msg");
+    }
+    
+    var sendMSG = await messaging.sendMessage(res, key);
 
-    io.emit("MessageStatus", sendMSG, key);
+    // Tries to get messages 
+    if(checkInDB === true){
+      res.messageKey = sendMSG.messageKey;
+
+      var msg = {
+        [res.messageKey]: [{ [res.name]: res.message, timeStamp: String(res.timeStamp) }]
+      };
+
+      // sendMSG.messageKey
+      io.emit("MSGChannel", msg, key,"msg");
+    }
   });
 
-
-  // socket.on('disconnect',(res)=> {
-  //     console.log(res);
-  // });
-
+  socket.on('UserOffline',(res)=> {
+      console.log(res);
+  });
 });
-
 
 // const mySqlDB = require("./HANDLERS/MySQLDB");
 // (async () => {
@@ -72,6 +86,9 @@ io.on("connection", (socket) =>{
 // app.get("/users/'name'/profile",(req,res)=>{res.render("Inbox")});
 // app.get("/users/'id'/messages",(req,res)=>{res.render("Inbox")});
 
+app.get("/", (req, res) => {
+  res.send("Connection was a Success");
+});
 // Making Server Live
 http.listen(process.env.PORT || 8080, function() {
   console.table({ "Host URL --> ": "http://localhost:8080" });

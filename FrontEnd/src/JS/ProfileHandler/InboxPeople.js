@@ -1,43 +1,48 @@
 import React from "react";
 
 export default function InboxPeople({
-  peopleData,
-  TogglePage,
-  myData,
-  LatestChats
+  people,
+  togglePage,
+  myDataID,
+  latestChats
 }) {
-  var msgCnt = -1,
-  chats = null,
-  timeStamp = null;
+  var msgCnt = 0;
 
 
   const People = () => {
-    return peopleData.map(data => {
-      if (!(data.ID === myData)) {
+    return people.map(data => {
+      var chats = " ",
+        timeStamp = " ",
+        status = data.status === "Online" ? "status" : "";
 
-        if((typeof LatestChats) === "object"){
-          msgCnt++;
+      if (data.ID !== myDataID + 1) {
+        if (typeof latestChats === "object") {
+          var myName = people[myDataID].userName,
+          myMsgKey = people[myDataID].messageKey,
+          key1 = myMsgKey+data.messageKey,
+          key2 = data.messageKey+myMsgKey,
+          check = latestChats[key2]?latestChats[key2]:latestChats[key1];
 
-          var objKeys = Object.keys(LatestChats[msgCnt]);
-
-
-          timeStamp = LatestChats[msgCnt].timeStamp;
-          chats = LatestChats[msgCnt][objKeys[0]];
-
-          console.log(chats);
-          // chats = LatestChats[msgCnt]?LatestChats[msgCnt]:"";
-        }
-
+          if(check !== undefined){
+              var objKeys = Object.keys(check);
+              timeStamp = check.timeStamp;
+              chats =
+                (objKeys[0] === myName
+                  ? "You: "
+                  : "") + check[objKeys[0]];
+            }
+          }
+        
         return (
           <>
             <div
               className="Person"
               messageKey={data.messageKey}
-              onClick={() => TogglePage("Messaging", data.ID - 1)}
+              onClick={() => togglePage("Messaging", data.ID - 1)}
             >
               <span id="ProfilePic">
                 <img src={data.picture} alt="IMG" />
-                <span id="status" />
+                <span id={status} />
               </span>
               <div className="details">
                 <h4>{data.userName}</h4>
@@ -52,6 +57,5 @@ export default function InboxPeople({
       }
     });
   };
-
   return <People />;
 }

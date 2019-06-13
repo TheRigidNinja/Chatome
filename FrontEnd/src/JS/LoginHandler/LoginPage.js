@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "../../CSS/Authentifacation.css";
 import Fire from "../../FIREBASE/FBConfig";
-import { Link } from "react-router-dom";
+import { Link, withRouter} from "react-router-dom";
 import { connect } from "react-redux";
 import ProfilePic from "./ProfilePic";
 
@@ -15,15 +15,15 @@ class LoginPage extends Component {
     alert: { padding: 0 }
   };
 
-  SubmitForm = async e => {
-    e.preventDefault();
+  async SubmitForm(event){
+    event.preventDefault();
 
     var elms = document.querySelectorAll(
         "#check1, #picture, #userLabel, #email, #password"
       ),
       returnLogs = null,
       source = elms[0].src.toString(),
-      userLoginData = {
+      myLoginData = {
         picture: "../" + source.slice(source.indexOf("public")),
         newCustomer: elms[1].checked,
         userName: elms[2].value,
@@ -32,17 +32,17 @@ class LoginPage extends Component {
       };
 
     // Validates Form Data and checks if everything is correct
-    if (this.ValidateFormData(userLoginData)) {
-      if (userLoginData.newCustomer === true) {
-        returnLogs = await this.RegisterHandler(userLoginData);
+    if (this.ValidateFormData(myLoginData)) {
+      if (myLoginData.newCustomer === true) {
+        returnLogs = await this.RegisterHandler(myLoginData);
       } else {
-        returnLogs = await this.LoginHandler(userLoginData);
+        returnLogs = await this.LoginHandler(myLoginData);
       }
 
       // Changes page IF user successfully Login or registers
       if (["Login", "Register"].includes(returnLogs.checkInType)) {
-        this.props.yourDetails(returnLogs); // Set to props
-        document.getElementById("GotoChat").click();
+        this.props.myDetails(returnLogs); // Set to props
+        this.props.history.push('/chat')
       }
     }
   };
@@ -76,22 +76,22 @@ class LoginPage extends Component {
   };
 
   //-----------------//   Registration Section
-  RegisterHandler = userLoginData => {
+  RegisterHandler(myLoginData){
     return Fire.auth()
       .createUserWithEmailAndPassword(
-        userLoginData.email,
-        userLoginData.password
+        myLoginData.email,
+        myLoginData.password
       )
-      .then(userInfo => {
-        delete userLoginData.email;
-        delete userLoginData.password;
-        delete userLoginData.newCustomer;
+      .then((userInfo) => {
+        delete myLoginData.email;
+        delete myLoginData.password;
+        delete myLoginData.newCustomer;
 
         const timeStamp = Date.parse(new Date()),
-          userFormInfo = {
+          myFormInfo = {
             ID: null,
             uuID: userInfo.user.uid,
-            ...userLoginData,
+            ...myLoginData,
             status: "Online",
             checkInType: "Register",
             messageKey: ((Math.random() * 1000).toString(16).substring()).replace(/[.]/g, ""),
@@ -101,27 +101,28 @@ class LoginPage extends Component {
             pictureUpdate: timeStamp
           };
 
-        return userFormInfo;
+        return myFormInfo;
       })
-      .catch(error => {
+      .catch((error)=> {
         return this.WarningHandler(error.message);
       });
   };
 
   //-----------------//   Login Section
-  LoginHandler = userLoginData => {
+  LoginHandler(myLoginData){
+
     return Fire.auth()
-      .signInWithEmailAndPassword(userLoginData.email, userLoginData.password)
-      .then(async userInfo => {
+      .signInWithEmailAndPassword(myLoginData.email, myLoginData.password)
+      .then((userInfo)=> {
         return { uuID: userInfo.user.uid, checkInType: "Login" };
       })
-      .catch(error => {
+      .catch((error)=> {
         return this.WarningHandler(error.message);
       });
   };
 
   // Checks if everything is correct in the form before submiting
-  ValidateFormData = formData => {
+  ValidateFormData(formData){
     var warnings = "";
 
     if (formData.password.replace(" ", "").length < 6) {
@@ -163,14 +164,12 @@ class LoginPage extends Component {
   render() {
     return (
       <section className="LoginSection">
-        <Link to="/Chat" id="GotoChat" />
-
         <span id="Alert" style={this.state.alert} />
         <div className="content container">
           <h3>Welcome to Chatome</h3>
 
           <form
-            onSubmit={event => this.SubmitForm(event)}
+            onSubmit={(event)=>(this.SubmitForm(event))}
             className="container d-flex flex-column LoginForm"
           >
             <div className="avatar">
@@ -228,7 +227,7 @@ class LoginPage extends Component {
 
 const mapDispatchToProps = dispatch => {
   return {
-    yourDetails: stutas => {
+    myDetails: stutas => {
       dispatch({ type: "UPDATE", data: stutas });
     }
   };

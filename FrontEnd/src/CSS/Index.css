@@ -82,6 +82,24 @@ section {
   }
 }
 
+#Loader {
+  position: absolute;
+  left: calc(50% - 75px);
+  top: calc(50% - 50px);
+  display: block;
+}
+
+#Loader img, #Loader small {
+  position: absolute;
+  width: 150px;
+  height: 100px;
+}
+
+#Loader small {
+  top: 90px;
+  left: 50px;
+}
+
 ::-webkit-scrollbar {
   width: 0px;
   height: 0px;

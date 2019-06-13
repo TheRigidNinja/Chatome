@@ -6,9 +6,10 @@ export default function Chats({ ChatData,myUserName }) {
   }
 
   const UserMessages = () => {
+
+    // console.log(ChatData);
     return ChatData.map(msg => {
       var userName = Object.keys(msg);
-
       if (userName[0] !== myUserName) {
         return (
           <li className="replyMessage" key={userName + Math.random()}>
