@@ -1,21 +1,31 @@
 import React, { Component } from "react";
 import "../../CSS/Authentifacation.css";
 import Fire from "../../FIREBASE/FBConfig";
-import { Link, withRouter} from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import ProfilePic from "./ProfilePic";
 
 class LoginPage extends Component {
   state = {
-    userNameStyle: {
-      display: "none",
+    formgroup: {
+      margin: "15px 0px"
+    },
+    loginForm: {
+      padding: "60px 20px"
+    },
+    avatar: {
       opacity: 0,
-      height: 0
+      height: 0,
+    },
+    userNameStyle: {
+      opacity: 0,
+      height: 0,
+      margin: "0px 0px"
     },
     alert: { padding: 0 }
   };
 
-  async SubmitForm(event){
+  async SubmitForm(event) {
     event.preventDefault();
 
     var elms = document.querySelectorAll(
@@ -42,10 +52,10 @@ class LoginPage extends Component {
       // Changes page IF user successfully Login or registers
       if (["Login", "Register"].includes(returnLogs.checkInType)) {
         this.props.myDetails(returnLogs); // Set to props
-        this.props.history.push('/chat')
+        this.props.history.push("/chat");
       }
     }
-  };
+  }
 
   RegisterBox = () => {
     var dom = document.querySelectorAll(".userName, #userLabel"),
@@ -56,33 +66,51 @@ class LoginPage extends Component {
       userLabel.removeAttribute("required");
 
       this.setState({
-        userNameStyle: {
-          display: "block",
+        formgroup: {
+          margin: "12px 0px"
+        },
+        loginForm: {
+          padding: "20px 20px"
+        },
+        avatar: {
           opacity: 1,
-          height: 70
+          height: 200,
+          // margin: "10px 0px 0px 50px"
+        },
+        userNameStyle: {
+          opacity: 1,
+          height: 70,
+          margin: "10px 0px"
         }
       });
     } else {
       userLabel.removeAttribute("required");
 
       this.setState({
+        formgroup: {
+          margin: "15px 0px"
+        },
+        loginForm: {
+          padding: "60px 20px"
+        },
+        avatar: {
+          opacity: 0,
+          height: 0
+        },
         userNameStyle: {
           opacity: 0,
           height: 0,
-          display: "none"
+          margin: "0px 0px"
         }
       });
     }
   };
 
   //-----------------//   Registration Section
-  RegisterHandler(myLoginData){
+  RegisterHandler(myLoginData) {
     return Fire.auth()
-      .createUserWithEmailAndPassword(
-        myLoginData.email,
-        myLoginData.password
-      )
-      .then((userInfo) => {
+      .createUserWithEmailAndPassword(myLoginData.email, myLoginData.password)
+      .then(userInfo => {
         delete myLoginData.email;
         delete myLoginData.password;
         delete myLoginData.newCustomer;
@@ -94,7 +122,10 @@ class LoginPage extends Component {
             ...myLoginData,
             status: "Online",
             checkInType: "Register",
-            messageKey: ((Math.random() * 1000).toString(16).substring()).replace(/[.]/g, ""),
+            messageKey: (Math.random() * 1000)
+              .toString(16)
+              .substring()
+              .replace(/[.]/g, ""),
             phoneUpdate: timeStamp,
             accountCreatedDATE: timeStamp,
             emailUpdate: timeStamp,
@@ -103,26 +134,25 @@ class LoginPage extends Component {
 
         return myFormInfo;
       })
-      .catch((error)=> {
+      .catch(error => {
         return this.WarningHandler(error.message);
       });
-  };
+  }
 
   //-----------------//   Login Section
-  LoginHandler(myLoginData){
-
+  LoginHandler(myLoginData) {
     return Fire.auth()
       .signInWithEmailAndPassword(myLoginData.email, myLoginData.password)
-      .then((userInfo)=> {
+      .then(userInfo => {
         return { uuID: userInfo.user.uid, checkInType: "Login" };
       })
-      .catch((error)=> {
+      .catch(error => {
         return this.WarningHandler(error.message);
       });
-  };
+  }
 
   // Checks if everything is correct in the form before submiting
-  ValidateFormData(formData){
+  ValidateFormData(formData) {
     var warnings = "";
 
     if (formData.password.replace(" ", "").length < 6) {
@@ -139,7 +169,7 @@ class LoginPage extends Component {
     } else {
       return true;
     }
-  };
+  }
 
   //-----// Alert box handler
   WarningHandler = data => {
@@ -169,14 +199,15 @@ class LoginPage extends Component {
           <h3>Welcome to Chatome</h3>
 
           <form
-            onSubmit={(event)=>(this.SubmitForm(event))}
+            onSubmit={event => this.SubmitForm(event)}
             className="container d-flex flex-column LoginForm"
+            style={this.state.loginForm}
           >
-            <div className="avatar">
-              <ProfilePic />
+            <div className="avatar" style={this.state.avatar}>
+              <ProfilePic imgStyle={this.state.avatar} />
             </div>
 
-            <div className="form-group">
+            <div className="form-group" style={this.state.formgroup}>
               <input type="checkbox" onChange={this.RegisterBox} id="check1" />
               <label className="form-check-label" htmlFor="check1">
                 - I'm new to this!!!
@@ -196,7 +227,7 @@ class LoginPage extends Component {
               />
             </div>
 
-            <div className="form-group">
+            <div className="form-group" style={this.state.formgroup}>
               <label>*Email</label>
               <input
                 type="email"
@@ -207,7 +238,7 @@ class LoginPage extends Component {
               />
             </div>
 
-            <div className="form-group">
+            <div className="form-group" style={this.state.formgroup}>
               <label>*Password </label>
               <input
                 type="password"

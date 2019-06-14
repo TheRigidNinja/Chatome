@@ -1,33 +1,44 @@
-import React from "react";
-import Camera from 'react-html5-camera-photo';
-import 'react-html5-camera-photo/build/css/index.css';
-import "../../CSS/RegisterPhoto.css"
-import { async } from "q";
+import React, { Component } from "react";
+import Webcam from "react-webcam";
+import "../../CSS/RegisterPhoto.css";
 
+export default class CameraHandler extends Component {
+  setRef = webcam => {
+    this.webcam = webcam;
+  };
 
+  capture = () => {
+    const imageSrc = this.webcam.getScreenshot();
+    // console.log(imageSrc)
+  };
 
+  render() {
+    const videoConstraints = {
+      width: 300,
+      height: 300,
+      facingMode: "user"
+    };
 
-function CameraHandler() {
+    return (
+      <div className="Camera">
+        <Webcam
+        className="RegisterPic"
+          audio={false}
+          ref={this.setRef}
+          screenshotFormat="image/jpeg"
+          width={300}
+          videoConstraints={videoConstraints}
+        />
+        <span onClick={this.capture} className="takePic">
+            <span/>
+        </span>
+      </div>
+    );
 
-    const OnTakePhoto = (dataUri)=>{
-        const blob = new Blob([dataUri], {type: 'application/octet-stream'}),
-        imgSrc = URL.createObjectURL(blob);
-        console.log(imgSrc);
-        if (imgSrc !== ""){
-            return <img alt="No" src={imgSrc}/>
-        }else{
-            return <img alt="No" src="##"/>
-        }
-    }
-
-
-  return (
-    <div className="RegisterPic">
-        <Camera onTakePhoto = { (dataUri) => {OnTakePhoto(dataUri)} }/>
-
-        <OnTakePhoto/>
-    </div>
-  );
+    // return (
+    //     <div>
+    //         {/* <img src={}/> */}
+    //     </div>
+    // )
+  }
 }
-
-export default CameraHandler;
