@@ -1,232 +1,172 @@
 const mysql = require("mysql"),
-  config = {
-    host: "localhost",
-    port: 8889,
-    user: "root",
-    password: "1234"
-  };
+  config = require("./ConfigFile")();
 
-// Creating DataBase
-function CreateDB(Name) {
-  const promise = new Promise(resolve => {
-    let connect = mysql.createConnection({ ...config });
-    connect.connect(function(err) {
-      if (err) {
-        resolve(["Error Connecting! to DB --->", err]);
-      }
+async function DataTomySQL(data, dbType) {
+  // Seperate OBJ keys and values to strings
+  var keysWithType = [],
+    keysNoType = [],
+    values = [],
+    sql = [];
 
-      if (/[^\s]/.test(Name)) {
-        let sql =
-          "CREATE DATABASE IF NOT EXISTS " + Name.replace(/ /g, "_") + "";
+  // -----// Binds Keys with Data type
+  for (let elm in data) {
+    if (elm !== "checkInType") {
+      var elmType = (() => {
+        switch (true) {
+          case [
+            "phoneUpdate",
+            "accountCreatedDATE",
+            "emailUpdate",
+            "pictureUpdate",
+            "status"
+          ].includes(elm):
+            return " VARCHAR(20) NOT NULL";
+          case [
+            "uuID",
+            "userName",
+            "messageKey",
+            "message",
+            "name",
+            "timeStamp"
+          ].includes(elm):
+            return " TEXT NOT NULL ";
+          case "picture" === elm:
+            return " LONGBLOB NOT NULL";
+          case "ID" === elm:
+            return " INT PRIMARY KEY AUTO_INCREMENT";
+        }
+      })();
 
-        connect.query(sql, (err, result) => {
-          if (err) {
-            resolve(["Error Connecting! to DB ---->", err]);
-          }
-          resolve("Done!");
-        });
-      } else {
-        resolve("DB name must not be empty");
-      }
-    });
-  });
-  return promise;
-}
+      keysWithType.push(elm + elmType);
+      keysNoType.push(elm);
+      values.push(data[elm]);
+    }
+  }
 
-// Creating Table in the DB
-function CreateTable({ dbName, tableName, Insertion, TableDetail }) {
-  const promise = new Promise(resolve => {
-    let connect = mysql.createConnection({
-      ...config,
-      database: dbName
-    });
+  keysNoType = keysNoType.toString();
 
-    connect.connect(function(err) {
-      if (err) {
-        resolve(["Error Connecting! to DB --->", err]);
-      }
-
-      if (/[^\s]/.test(tableName)) {
-        var tableKeys = "";
-
-        Insertion.keys.forEach(element => {
-          let elementType = element.slice(element.indexOf("-") + 1);
-          element = element.slice(element.indexOf("-") - 1);
-
-          switch (elementType) {
-            case "time":
-              tableKeys +=
-                element + " TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, ";
-              break;
-
-            case "Id":
-              break;
-
-            case "boolean":
-              break;
-
-            case "text":
-              tableKeys += element + " TEXT NOT NULL, ";
-              break;
-
-            case "int":
-              break;
-          }
-        });
-
-        let sql =
-          "CREATE TABLE IF NOT EXISTS " +
-          TableDetail.tableName.replace(/ /g, "_") +
-          "(" +
-          // Replaces last , accurance
-          "" +
-          tableKeys.replace(/,([^,]*)$/, "$1") +
-          ")";
-
-        connect.query(sql, (err, result) => {
-          if (err) {
-            resolve(["Error Making table ---->", err]);
-          }
-
-          resolve("Done!");
-        });
-      } else {
-        resolve("Table name must not be empty");
-      }
-    });
-  });
-
-  return promise;
-}
-
-// Inserting Values From DB
-async function InsertValue({
-  tableName,
-  database,
-  Insertion,
-  dbName,
-  TableDetail
-}) {
-  const promise = new Promise(resolve => {
-    let connect = mysql.createConnection({
-      ...config,
-      database: dbName
-    });
-
-    connect.connect(function(err) {
-      if (err) {
-        resolve(["Error Connecting! to DB --->", err]);
-      }
-
-      if (Object.keys(Insertion).length === 3) {
-        let sql =
-          "INSERT INTO " +
-          tableName +
+  switch (data.checkInType) {
+    case "Register":
+      sql.push(
+        "CREATE DATABASE IF NOT EXISTS " + dbType.db,
+        "CREATE TABLE IF NOT EXISTS " +
+          dbType.dbTable +
           " (" +
-          Insertion.keys.toString() +
-          ") VALUES ?";
+          keysWithType +
+          ")",
+        "INSERT INTO " + dbType.dbTable + " (" + keysNoType + ") VALUES ?"
+      );
 
-        connect.query(sql, [Insertion.values], (err, result) => {
-          if (err) {
-            resolve(["Error Inserting values to table ---->", err]);
-          }
-          resolve("Done!");
-        });
-      } else {
-        resolve("Values must not be empty");
-      }
-    });
-  });
+      break;
 
-  return promise;
-}
+    case "Login":
+      sql.push("SELECT *, NULL AS uuID FROM " + dbType.dbTable + "");
+      break;
 
-// Selecting Values From DB
-async function SelectValues({
-  dbName,
-  tableName,
-  exactValues,
-  whereRules,
-  orderBy,
-  SelectDetails
-}) {
-  const promise = new Promise(resolve => {
-    let connect = mysql.createConnection({ ...config, database: dbName });
-    connect.connect(function(err) {
-      if (err) {
-        resolve(["Error Connecting! to DB --->", err]);
-      }
+    case "MyData":
+      sql.push(
+        "SELECT ID FROM " + dbType.dbTable + " WHERE uuID='" + data.uuID + "'"
+      );
+      break;
 
-      let colExactValues = Object.keys(exactValues).toString() || "*",
-        orderByElm = "";
-      fieldRules = "";
+    case "Chats":
+      sql.push("SELECT * FROM " + dbType.dbTable + " ORDER BY timeStamp ASC");
+      break;
 
-      // fieldRules2 = ([fieldRules1.length]).toString().replace("true"," ") || " WHERE"+fieldRules1;
-      if (whereRules.length > 4 && /%|=/g.test(whereRules)) {
-        if (/LIKE/g.test(whereRules)) {
-          fieldRules = " WHERE " + whereRules.replace("LIKE ", "LIKE '") + "'";
-        } else {
-          fieldRules = " WHERE " + whereRules.replace("=", "='") + "'";
-        }
-      }
+    case "Friends":
+      sql.push("SELECT * FROM " + data.uuID);
+      break;
 
-      if (orderBy !== "") {
-        orderByElm = " " + orderBy;
-      }
+    default:
+      return '"checkInType" did not match';
+  }
 
-      let sql =
-        "SELECT " +
-        colExactValues +
-        " FROM " +
-        tableName +
-        orderByElm +
-        "" +
-        fieldRules;
+  // Interacting with mySQL DataBase!
+  var promise1, promise2, promise3, promise4, connect;
+  sql.forEach(elm => {
+    
+    // Creates Database
+    if (/DATABASE/g.test(elm) && data.checkInType === "Register") {
+      promise1 = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          connect = mysql.createConnection({ ...config });
+          connect.query(elm, (err, result) => {
+            if (err) reject(["Error CreatingDB ---->", err]);
+            resolve(["Done! Creating DB", result]);
+          });
 
-      console.log(sql);
-      connect.query(sql, (err, result) => {
-        if (err) {
-          resolve(["Values from table ---->", err]);
-        }
-        resolve(result);
+          connect.end();
+        }, 10);
+      }).catch(err => {
+        return ["--> Promise erro", err];
       });
+    }
 
-      //       }else{resolve("Values must not be empty");}
-    });
+    // Creating tables
+    if (/TABLE/g.test(elm)) {
+      promise2 = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          connect = mysql.createConnection({
+            ...config,
+            database: dbType.db
+          });
+
+          connect.query(elm, err => {
+            if (err) reject(["Error Creating TABLE ---->", err]);
+            resolve("Done! Creating Table");
+          });
+
+          connect.end();
+        }, 20);
+      }).catch(err => {
+        return ["--> Promise erro", err];
+      });
+    }
+
+    // Inserts values in a table
+    if (/INSERT INTO/g.test(elm)) {
+      promise3 = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          connect = mysql.createConnection({
+            ...config,
+            database: dbType.db
+          });
+
+          connect.query(elm, [[values]], (err, result) => {
+            if (err) reject(["Error Inserting VALUES to table ---->", err]);
+            resolve("Done! Inserting Values");
+          });
+
+          connect.end();
+        }, 30);
+      }).catch(err => {
+        return ["--> Promise erro", err];
+      });
+    }
+
+    // Handles Login data retrieval from Database
+    if (["Login", "MyData", "Chats", "Friends"].includes(data.checkInType)) {
+      promise4 = new Promise((resolve, reject) => {
+        connect = mysql.createConnection({
+          ...config,
+          database: dbType.db
+        });
+
+        connect.query(elm, (err, result) => {
+          if (err) reject(["Error selecting values to table ---->", err]);
+          resolve(result);
+        });
+
+        connect.end();
+      }).catch(err => {
+        return ["--> Promise erro", err];
+      });
+    }
   });
 
-  return promise;
+  return Promise.all([promise1, promise2, promise3, promise4]);
 }
-
-// function FetchProfileDetials(){
-
-//     var connect = mysql.createConnection({
-//         host: "localhost",
-//         port:8889,
-//         user: "root",
-//         password: "1234",
-//         database: "ProfileDetails"
-//       });
-
-//       connect.connect(function(err) {
-//         if (err){
-//           console.log("---->","err");
-//         };
-
-//         let sql = "CREATE DATABASE IF NOT EXISTS ProfileDetails";
-//         // let sql = "CREATE TABLE ProfileDetails (name VARCHAR(255), address VARCHAR(255))";
-
-//         connect.query(sql, (err,result)=>{
-//           if (err) throw err;
-//             console.log(result);
-//         });
-
-//       });
-// }
 
 module.exports = {
-  CreateDB: CreateDB,
-  CreateTable: CreateTable,
-  InsertValue: InsertValue,
-  SelectValues: SelectValues
+  DataTomySQL: DataTomySQL
 };

@@ -16,18 +16,19 @@
 .LoginSection:before, .LoginSection:after {
   height: 500px;
   width: 320px;
-  -webkit-transform: rotate(-60deg);
-          transform: rotate(-60deg);
+  -webkit-transform: rotate(70deg);
+          transform: rotate(70deg);
   content: "";
   display: block;
   position: absolute;
-  top: -250px;
+  top: -240px;
   background-color: #ee4180;
-  border-radius: 5px;
+  border-radius: 40%;
 }
 
 .LoginSection:before {
   top: calc(100% - 150px);
+  left: 20px;
 }
 
 #Alert {
@@ -47,8 +48,7 @@
   z-index: 1;
   background: white;
   border-radius: 5px;
-  padding: 20px;
-  margin: 20px 0px;
+  margin-bottom: 20px;
   -webkit-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.158);
           box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.158);
 }
@@ -63,20 +63,34 @@
   z-index: 2;
 }
 
+.form-group {
+  margin: 15px 0px;
+}
+
+.LoginForm {
+  padding: 60px 20px;
+}
+
 /* --------------- Avitar Section --------------- */
 .avatar, .LoginSection img {
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 0px;
 }
 
 .avatar {
+  -webkit-transition: all .2s;
+  transition: all .2s;
   position: relative;
-  left: calc(50% - 50px);
-  margin-bottom: 20px;
+  left: calc(50% - 100px);
+  margin-bottom: 25px;
+  opacity: 0;
 }
 
 .LoginSection img {
+  -webkit-transition: all .2s;
+  transition: all .2s;
   border-radius: 50%;
+  opacity: 0;
 }
 
 .avatar i {
@@ -87,10 +101,10 @@
   border-radius: 50%;
   background: white;
   z-index: 1;
-  border: 8px solid white;
-  font-size: 15px;
-  left: 70px;
-  top: 70px;
+  border: 10px solid white;
+  font-size: 40px;
+  left: calc(100% - 74px);
+  top: calc(100% - 50px);
 }
 
 /* --------------- Input Style --------------- */
