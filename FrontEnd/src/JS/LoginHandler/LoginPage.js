@@ -20,7 +20,8 @@ class LoginPage extends Component {
     userNameStyle: {
       opacity: 0,
       height: 0,
-      margin: "0px 0px"
+      margin: "0px 0px",
+      display: "none"
     },
     alert: { padding: 0 }
   };
@@ -32,9 +33,8 @@ class LoginPage extends Component {
         "#check1, #picture, #userLabel, #email, #password"
       ),
       returnLogs = null,
-      source = elms[0].src.toString(),
       myLoginData = {
-        picture: "../" + source.slice(source.indexOf("public")),
+        picture: elms[0].src.toString(),
         newCustomer: elms[1].checked,
         userName: elms[2].value,
         email: elms[3].value,
@@ -80,7 +80,8 @@ class LoginPage extends Component {
         userNameStyle: {
           opacity: 1,
           height: 70,
-          margin: "10px 0px"
+          margin: "10px 0px",
+          display: "block"
         }
       });
     } else {
@@ -100,7 +101,8 @@ class LoginPage extends Component {
         userNameStyle: {
           opacity: 0,
           height: 0,
-          margin: "0px 0px"
+          margin: "0px 0px",
+          display: "none"
         }
       });
     }

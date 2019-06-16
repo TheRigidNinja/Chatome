@@ -178,7 +178,7 @@ class MessagingArea extends Component {
 
         {/* A place where messages show */}
         <ul className="msgDashboard">
-          <Chats ChatData={messageData} myUserName={myUserName} />
+          <Chats ChatData={messageData} myUserName={myUserName} ImgSrc={picture}/>
         </ul>
 
         {/* A place where users type */}

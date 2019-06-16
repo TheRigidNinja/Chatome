@@ -9,7 +9,9 @@ io.on("connection", socket => {
   // Getting All Profile data for all users
   socket.on("GetAllProfileData", async (res, key) => {
     var profileDataRetrieval = await profile.serveProfile(res);
+    
 
+    // console.log(profileDataRetrieval.profile[3])
     // Emits back to client all profile data from all users
     io.emit("AllProfileData", profileDataRetrieval, key);
   });
@@ -47,9 +49,9 @@ io.on("connection", socket => {
     }
   });
 
-  socket.on('UserOffline',(res)=> {
-      console.log(res);
-  });
+  // socket.on('UserOffline',(res)=> {
+  //     console.log(res);
+  // });
 });
 
 // const mySqlDB = require("./HANDLERS/MySQLDB");

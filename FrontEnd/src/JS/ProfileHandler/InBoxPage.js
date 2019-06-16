@@ -66,6 +66,8 @@ class ProfilePage extends Component {
           myID = res.myData[3][0].ID - 1;
         }
 
+        console.log(myID);
+
         this.setState({
           ...this.state,
           myDataID: myID === "" ? this.state.myDataID : myID,
@@ -126,13 +128,15 @@ class ProfilePage extends Component {
     var myID = this.state.myDataID,
       picture = this.state.people[myID];
 
-    if (myID === null) {
+    if (!picture) {
       return (
         <div id="Loader">
           <img src={loaderGIF} />
           <small>Loading...</small>
         </div>
       );
+    }else{
+      picture = picture.picture;
     }
 
     return (
@@ -178,7 +182,7 @@ class ProfilePage extends Component {
             {/* Shows your profile */}
             <div className="ProfileManager">
               <div className="myDetails">
-                <img src="##" id="userPicture" alt="IMG" />
+                <img src={picture} id="userPicture" alt="IMG" />
                 <span className="editImg">
                   <i className="fas fa-user-edit" />
                 </span>

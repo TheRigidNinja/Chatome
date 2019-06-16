@@ -21,3 +21,8 @@ ConfigFile.js
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
+# Sentative files 
+adminsdk.json
+Config.js

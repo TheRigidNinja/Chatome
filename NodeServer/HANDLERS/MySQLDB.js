@@ -1,7 +1,15 @@
 const mysql = require("mysql"),
+DatabaseHandler = require("./FIREBASE_HANDLER/FirebaseDB");
   config = require("./ConfigFile")();
 
 async function DataTomySQL(data, dbType) {
+  // console.log("========== INPUT DATA =========\n");
+  // console.log(data, dbType);
+  // console.log("\n========== ========== =========");
+  //----// Firebase handler 
+  // return DatabaseHandler.DatabaseHandler(data, dbType)
+  //-------------------// 
+
   // Seperate OBJ keys and values to strings
   var keysWithType = [],
     keysNoType = [],
@@ -27,11 +35,10 @@ async function DataTomySQL(data, dbType) {
             "messageKey",
             "message",
             "name",
+            "picture",
             "timeStamp"
           ].includes(elm):
             return " TEXT NOT NULL ";
-          case "picture" === elm:
-            return " LONGBLOB NOT NULL";
           case "ID" === elm:
             return " INT PRIMARY KEY AUTO_INCREMENT";
         }

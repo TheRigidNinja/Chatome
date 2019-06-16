@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Chats({ ChatData,myUserName }) {
+export default function Chats({ ChatData,myUserName,ImgSrc }) {
   if(!ChatData){
     return <></>
   }
@@ -15,7 +15,7 @@ export default function Chats({ ChatData,myUserName }) {
           <li className="replyMessage" key={userName + Math.random()}>
             <time>{msg[userName[1]]}</time>
             <div>
-              <img src="../public/img/User.svg" id="userIcon" alt="IMG" />
+              <img src={ImgSrc} id="userIcon" alt="IMG" />
               <label>{userName[0]}</label>
               <p>{msg[userName[0]]}</p>
             </div>

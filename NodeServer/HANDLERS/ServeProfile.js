@@ -22,6 +22,7 @@ async function serveProfile(clientsData) {
   // Get the individual requested user data among other profiles in the DB
   clientsData.checkInType = "MyData";
   dataRetrieval.myData = await mySqlDB.DataTomySQL(clientsData, dbType);
+  // console.log(dataRetrieval.myData);
 
   // Get friends if you have them
   dbType = { db: "Friends", dbTable: clientsData.uuID };

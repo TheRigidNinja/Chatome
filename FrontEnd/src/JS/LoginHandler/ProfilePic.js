@@ -6,8 +6,20 @@ import defaultPic from "../../IMG/defaultPic.jpeg";
 export default class ProfilePic extends Component {
   state = {
     toggleProfile: "Profile",
-    profilePic: defaultPic
+    profilePic: defaultPic,
+    touchEvent: false
   };
+
+  componentDidMount() {
+    // Check if touch screen
+    this.setState({
+      touchEvent: this.checkTouchDevice()
+    });
+  }
+
+  checkTouchDevice() {
+    return "ontouchstart" in document.documentElement;
+  }
 
   setRef = webcam => {
     this.webcam = webcam;
@@ -48,7 +60,7 @@ export default class ProfilePic extends Component {
           />
         </>
       );
-    } else {
+    } else if (this.state.touchEvent === false) {
       return (
         <div className="Camera">
           <Webcam
@@ -63,6 +75,12 @@ export default class ProfilePic extends Component {
             <span />
           </span>
         </div>
+      );
+    } else {
+      return (
+        <>
+          <input type="file" accept="image/*" capture="camera" />
+        </>
       );
     }
   }

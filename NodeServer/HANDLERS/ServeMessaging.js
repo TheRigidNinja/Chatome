@@ -8,6 +8,7 @@ async function serverMessaging(clientsData) {
   if (clientsData.checkInType === "Friends") {
     var dbType = { db: "Friends", dbTable: clientsData.uuID },
       msgKeysData = await mySqlDB.DataTomySQL(clientsData, dbType);
+      // console.log("===>Friends",msgKeysData)
 
     // Sets uuID in the local msgKeys storage if not exists
     if (!msgKeyStore[clientsData.uuID]) {
@@ -15,6 +16,8 @@ async function serverMessaging(clientsData) {
     }
 
     // just getting the msgKey only
+
+    // console.log(msgKeysData[3])
     msgKeysData[3].forEach(element => {
       msgKeyStore[clientsData.uuID].push(element.messageKey);
     });
@@ -27,7 +30,7 @@ async function serverMessaging(clientsData) {
     var dbType = { db: "MSGChannel", dbTable: key };
     clientsData.checkInType = "Chats";
     msgData = (await mySqlDB.DataTomySQL(clientsData, dbType))[3];
-
+    // console.log("===>Chats",msgData)
     // Creates key in MSGChannel if not exists
     // if (!MSGChannel[key]) {
     //   MSGChannel[key] = [];

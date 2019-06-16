@@ -1,4 +1,5 @@
 import React from "react";
+import addStory from "../../IMG/story.svg";
 
 export default function OnlinePeople({ people, togglePage, myDataID }) {
   const People = () => {
@@ -29,7 +30,7 @@ export default function OnlinePeople({ people, togglePage, myDataID }) {
   return (
     <div className="onlinePeople">
       <div className="Onlineperson" onClick={0}>
-        <img src="../public/Img/Story.svg" alt="IMG" />
+        <img src={addStory} alt="IMG" />
         <h6>Your story</h6>
       </div>
       <People />
