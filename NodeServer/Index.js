@@ -5,53 +5,71 @@ const express = require("express"),
   profile = require("./HANDLERS/serveProfile"),
   messaging = require("./HANDLERS/ServeMessaging");
 
-io.on("connection", socket => {
-  // Getting All Profile data for all users
-  socket.on("GetAllProfileData", async (res, key) => {
-    var profileDataRetrieval = await profile.serveProfile(res);
-    
+var connectClients = {};
+var roomSubscribe = [];
 
-    // console.log(profileDataRetrieval.profile[3])
-    // Emits back to client all profile data from all users
-    io.emit("AllProfileData", profileDataRetrieval, key);
+io.on("connection", socket => {
+  // --- // Checks user name if taken
+  socket.on("FetchUserNames", async req => {
+    let warning = await profile.checkUserName(req);
+    socket.emit("ReturnUserNames", warning);
   });
 
-  // Handles getting individual accounts MSG from DataBase
+  // --- // Getting All Profile data for all users
+  socket.on("getUsersProfileDATA", async (req, key) => {
+    let profileDataRetrieval = await profile.serveProfile(req);
+
+    // You get all the data from everybody
+    socket.emit("returnUsersProfileDATA", profileDataRetrieval, key);
+
+    // Everybody gets update about you
+    socket.broadcast.emit(
+      "returnUsersProfileDATA",
+      (() => {
+        var onlineUser = profileDataRetrieval.mydata;
+        return profileDataRetrieval[onlineUser];
+      })()
+    );
+  });
+
+  // --- // Message communication handler
+
+  // --- // Write messages to the DB
+  socket.on("SendMessage", async (res, key) => {
+    var sendMSG = await messaging.sendMessage(res, key);
+
+    // Subscribe to a room
+    // if(!roomSubscribe.includes(sendMSG)){
+    //   socket.join(sendMSG)
+    //   roomSubscribe.push(sendMSG);
+    // }
+
+    // io.sockets.in(sendMSG).emit(sendMSG,res);
+
+    socket.emit("FriendsMSG",res,sendMSG)
+  });
+
+  // // --- // Handles getting individual accounts MSG from DataBase
   socket.on("GetMessages", async (res, key) => {
     var msgData = await messaging.serverMessaging(res);
-
+    // console.log(msgData);
     io.emit("MSGChannel", msgData, key);
   });
 
-  // Write MSG to DataBase
-  socket.on("SendMessage", async (res, key) => {
-    var msg = {
-      [res.messageKey]: [{ [res.name]: res.message, timeStamp: String(res.timeStamp) }]
-    },
-    checkInDB = /[|]/g.test(res.messageKey);
-    
-    if(checkInDB == false){
-      io.emit("MSGChannel", msg, key,"msg");
-    }
-    
-    var sendMSG = await messaging.sendMessage(res, key);
-
-    // Tries to get messages 
-    if(checkInDB === true){
-      res.messageKey = sendMSG.messageKey;
-
-      var msg = {
-        [res.messageKey]: [{ [res.name]: res.message, timeStamp: String(res.timeStamp) }]
-      };
-
-      // sendMSG.messageKey
-      io.emit("MSGChannel", msg, key,"msg");
-    }
+  // Handle Disconnection
+  socket.on("ConnectClients", res => {
+    connectClients[socket.id] = res;
   });
 
-  // socket.on('UserOffline',(res)=> {
-  //     console.log(res);
-  // });
+  socket.on("disconnect", async res => {
+    var disconnectKey = connectClients[socket.id];
+    if (disconnectKey) {
+      var disc = await profile.disconnectHandler(disconnectKey.uuID);
+      socket.broadcast.emit("UserOffline", disconnectKey.id);
+
+      delete disconnectKey;
+    }
+  });
 });
 
 // const mySqlDB = require("./HANDLERS/MySQLDB");

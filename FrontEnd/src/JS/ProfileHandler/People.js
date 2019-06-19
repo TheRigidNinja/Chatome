@@ -1,4 +1,6 @@
 import React from "react";
+import LZString from "lz-string";
+import { async } from "q";
 
 export default function InboxPeople({
   people,
@@ -8,13 +10,15 @@ export default function InboxPeople({
 }) {
   var msgCnt = 0;
 
+  // console.log(LZString.decompress("঄〮⁜ॠ똠猂頞聖r䈍쀣ဆ牀㘀堁ꅀ临匠䄆ѐ᥀欀됂选䄆失ᰡ耑᐀頃먈铀Ⲁ愆ࠂ䦨䪽䛅는丐"))
+
   const People = () => {
     return people.map(data => {
       var chats = " ",
         timeStamp = " ",
         status = data.status === "Online" ? "status" : "";
 
-      if (data.ID !== myDataID + 1) {
+      if (data.ID !== myDataID) {
         if (typeof latestChats === "object") {
           var myName = people[myDataID].userName,
             myMsgKey = people[myDataID].messageKey,
@@ -33,8 +37,8 @@ export default function InboxPeople({
           <>
             <div
               className="Person"
-              messageKey={data.messageKey}
-              onClick={() => togglePage("Messaging", data.ID - 1)}
+              messagekey={data.messageKey}
+              onClick={() => togglePage("MessagingBoard", data.ID)}
             >
               <span id="ProfilePic">
                 <img src={data.picture} alt="IMG" />
@@ -53,5 +57,7 @@ export default function InboxPeople({
       }
     });
   };
+
+  // var PeopleDATA  = JSON.stringify(People());
   return <People />;
 }

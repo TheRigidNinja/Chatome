@@ -1,31 +1,25 @@
 import React, { Component } from "react";
 import "../../CSS/Authentifacation.css";
 import Fire from "../../FIREBASE/FBConfig";
-import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import ProfilePic from "./ProfilePic";
+import socket from "../Socket";
+import LZString from "lz-string";
 
 class LoginPage extends Component {
   state = {
-    formgroup: {
-      margin: "15px 0px"
-    },
-    loginForm: {
-      padding: "60px 20px"
-    },
     avatar: {
       opacity: 0,
-      height: 0,
+      "margin-top": -230
     },
     userNameStyle: {
-      opacity: 0,
-      height: 0,
-      margin: "0px 0px",
       display: "none"
     },
     alert: { padding: 0 }
   };
 
+  //----//  This function handles form submition --> It simply sends user content to props
+  //----//  It also Takes user to the chat app home
   async SubmitForm(event) {
     event.preventDefault();
 
@@ -42,21 +36,24 @@ class LoginPage extends Component {
       };
 
     // Validates Form Data and checks if everything is correct
-    if (this.ValidateFormData(myLoginData)) {
+    if (await this.ValidateFormData(myLoginData)) {
       if (myLoginData.newCustomer === true) {
         returnLogs = await this.RegisterHandler(myLoginData);
       } else {
         returnLogs = await this.LoginHandler(myLoginData);
       }
-
       // Changes page IF user successfully Login or registers
-      if (["Login", "Register"].includes(returnLogs.checkInType)) {
+      if (
+        returnLogs !== null &&
+        ["Login", "Register"].includes(returnLogs.checkInType)
+      ) {
         this.props.myDetails(returnLogs); // Set to props
         this.props.history.push("/chat");
       }
     }
   }
 
+  //----// This function is triggered when user toggles "I'm new here Checkbox"
   RegisterBox = () => {
     var dom = document.querySelectorAll(".userName, #userLabel"),
       userName = dom[0],
@@ -64,23 +61,13 @@ class LoginPage extends Component {
 
     if (userName.offsetHeight === 0) {
       userLabel.removeAttribute("required");
-
+      // formgroup
       this.setState({
-        formgroup: {
-          margin: "12px 0px"
-        },
-        loginForm: {
-          padding: "20px 20px"
-        },
         avatar: {
           opacity: 1,
-          height: 200,
-          // margin: "10px 0px 0px 50px"
+          "margin-top": 0
         },
         userNameStyle: {
-          opacity: 1,
-          height: 70,
-          margin: "10px 0px",
           display: "block"
         }
       });
@@ -88,27 +75,18 @@ class LoginPage extends Component {
       userLabel.removeAttribute("required");
 
       this.setState({
-        formgroup: {
-          margin: "15px 0px"
-        },
-        loginForm: {
-          padding: "60px 20px"
-        },
         avatar: {
           opacity: 0,
-          height: 0
+          "margin-top": -230
         },
         userNameStyle: {
-          opacity: 0,
-          height: 0,
-          margin: "0px 0px",
           display: "none"
         }
       });
     }
   };
 
-  //-----------------//   Registration Section
+  //----// This function will trigger when a user wants to register --> the trigger happens when a user presses submit button
   RegisterHandler(myLoginData) {
     return Fire.auth()
       .createUserWithEmailAndPassword(myLoginData.email, myLoginData.password)
@@ -119,7 +97,6 @@ class LoginPage extends Component {
 
         const timeStamp = Date.parse(new Date()),
           myFormInfo = {
-            ID: null,
             uuID: userInfo.user.uid,
             ...myLoginData,
             status: "Online",
@@ -141,7 +118,7 @@ class LoginPage extends Component {
       });
   }
 
-  //-----------------//   Login Section
+  //----//   Handles Login process, It triggers when user presses Submit button
   LoginHandler(myLoginData) {
     return Fire.auth()
       .signInWithEmailAndPassword(myLoginData.email, myLoginData.password)
@@ -153,8 +130,8 @@ class LoginPage extends Component {
       });
   }
 
-  // Checks if everything is correct in the form before submiting
-  ValidateFormData(formData) {
+  //----//  This function only works after user presses submit --> It will check user input if valid
+  async ValidateFormData(formData) {
     var warnings = "";
 
     if (formData.password.replace(" ", "").length < 6) {
@@ -165,6 +142,20 @@ class LoginPage extends Component {
       warnings += "User Name must be > 4 char|";
     }
 
+    // Check for userName in the server
+    if (formData.newCustomer === true) {
+      socket.emit("FetchUserNames", formData.userName);
+
+      // Wait for response
+      var promise = new Promise(resolve => {
+        socket.on("ReturnUserNames", res => {
+          resolve(res);
+        });
+      });
+
+      warnings += await promise;
+    }
+
     // Showing warnings to the user
     if (warnings !== "") {
       return this.WarningHandler(warnings);
@@ -173,7 +164,7 @@ class LoginPage extends Component {
     }
   }
 
-  //-----// Alert box handler
+  //-----// This function handles all alerts, to let the user know whats wrong
   WarningHandler = data => {
     let alert = document.getElementById("Alert");
     alert.innerText = data.replace(/\|/g, "\n");
@@ -203,13 +194,15 @@ class LoginPage extends Component {
           <form
             onSubmit={event => this.SubmitForm(event)}
             className="container d-flex flex-column LoginForm"
-            style={this.state.loginForm}
           >
             <div className="avatar" style={this.state.avatar}>
-              <ProfilePic imgStyle={this.state.avatar} />
+              <ProfilePic
+                imgStyle={this.state.avatar}
+                WarningHandler={this.WarningHandler}
+              />
             </div>
 
-            <div className="form-group" style={this.state.formgroup}>
+            <div className="form-group">
               <input type="checkbox" onChange={this.RegisterBox} id="check1" />
               <label className="form-check-label" htmlFor="check1">
                 - I'm new to this!!!
@@ -229,7 +222,7 @@ class LoginPage extends Component {
               />
             </div>
 
-            <div className="form-group" style={this.state.formgroup}>
+            <div className="form-group">
               <label>*Email</label>
               <input
                 type="email"
@@ -240,7 +233,7 @@ class LoginPage extends Component {
               />
             </div>
 
-            <div className="form-group" style={this.state.formgroup}>
+            <div className="form-group">
               <label>*Password </label>
               <input
                 type="password"

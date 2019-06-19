@@ -44,7 +44,6 @@
     z-index: 1
     background: white
     border-radius: 5px
-    // padding: 20px
     margin-bottom: 20px
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.158)
 
@@ -62,12 +61,13 @@
     margin: 15px 0px
     
 .LoginForm
+    overflow: hidden
     padding: 60px 20px
 
 /* --------------- Avitar Section --------------- */
 %avatarProfile
     width: 200px
-    height: 0px    
+    height: 200px    
 
 .avatar
     transition: all .2s
@@ -75,12 +75,10 @@
     @extend %avatarProfile
     left: calc(50% - 100px)
     margin-bottom: 25px
-    opacity: 0
 
 .LoginSection img 
     transition: all .2s
     border-radius: 50%
-    opacity: 0
     @extend %avatarProfile
 
 .avatar i
@@ -122,11 +120,6 @@
     width: 5%
 
 
-
-// Register Toggle 
-.userName
-    transition: all .2s
-
 .LoginSection h3
     position: relative
     z-index: 1
@@ -134,7 +127,6 @@
     color: white 
     top: 20px
     padding: 25px 0px
-    // background: orange
 
 
 /* --------------- Affects --------------- */

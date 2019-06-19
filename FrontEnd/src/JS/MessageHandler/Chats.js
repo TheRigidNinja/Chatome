@@ -1,33 +1,32 @@
 import React from "react";
 
-export default function Chats({ ChatData,myUserName,ImgSrc }) {
-  if(!ChatData){
-    return <></>
+export default function Chats({ ChatData, myUserName, ImgSrc }) {
+  if (!ChatData) {
+    return <></>;
   }
-
+  
   const UserMessages = () => {
-
-    // console.log(ChatData);
     return ChatData.map(msg => {
       var userName = Object.keys(msg);
-      if (userName[0] !== myUserName) {
+
+      if (msg.name !== myUserName) {
         return (
-          <li className="replyMessage" key={userName + Math.random()}>
-            <time>{msg[userName[1]]}</time>
+          <li className="replyMessage" key={myUserName + Math.random()}>
+            <time>{msg.timeStamp}</time>
             <div>
               <img src={ImgSrc} id="userIcon" alt="IMG" />
-              <label>{userName[0]}</label>
-              <p>{msg[userName[0]]}</p>
+              <label>{msg.name}</label>
+              <p>{msg.message}</p>
             </div>
           </li>
         );
       } else {
         return (
           <li className="sentMessage" key={userName + Math.random()}>
-            <time>{msg[userName[1]]}</time>
+            <time>{msg.timeStamp}</time>
             <div>
-              <label>{userName[0]}</label>
-              <p>{msg[userName[0]]}</p>
+              <label>{msg.name}</label>
+              <p>{msg.message}</p>
             </div>
           </li>
         );

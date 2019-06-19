@@ -1,16 +1,19 @@
 import React from "react";
 import addStory from "../../IMG/story.svg";
+import LZString from "lz-string";
 
 export default function OnlinePeople({ people, togglePage, myDataID }) {
+
   const People = () => {
     try {
       return people.map(data => {
-        if (data.ID !== myDataID + 1 && data.status == "Online") {
+        if (data.ID !== myDataID && data.status === "Online") {
           return (
             <>
               <div
+                key={Math.random()}
                 className="Onlineperson"
-                onClick={() => togglePage("Messaging", data.ID - 1)}
+                onClick={() => togglePage("MessagingBoard", data.ID)}
               >
                 <img src={data.picture} />
                 <span id="status" />
