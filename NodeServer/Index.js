@@ -37,7 +37,6 @@ io.on("connection", socket => {
   // --- // Write messages to the DB
   socket.on("SendMessage", async (res, key) => {
     var sendMSG = await messaging.sendMessage(res, key);
-
     // Subscribe to a room
     // if(!roomSubscribe.includes(sendMSG)){
     //   socket.join(sendMSG)
@@ -45,8 +44,7 @@ io.on("connection", socket => {
     // }
 
     // io.sockets.in(sendMSG).emit(sendMSG,res);
-
-    socket.emit("FriendsMSG",res,sendMSG)
+    socket.emit("FriendsMSG", res, sendMSG);
   });
 
   // // --- // Handles getting individual accounts MSG from DataBase
@@ -71,7 +69,6 @@ io.on("connection", socket => {
     }
   });
 });
-
 // const mySqlDB = require("./HANDLERS/MySQLDB");
 // (async () => {
 //   var resLogin = { uuID: "8ADuY8NxkSd3MaqT3WM72ZEpznN2", checkInType: "Login" };
