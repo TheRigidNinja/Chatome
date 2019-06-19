@@ -1,64 +1,43 @@
-const mySqlDB = require("./MySQLDB");
-
-var msgKeyStore = {},
-  MSGChannel = {};
+const dataBase = require("../HANDLERS/FIREBASE_HANDLER/FirebaseDB"); //require("./MySQLDB");
+var msgKeyStore = [],
+  tempChats = {};
 
 async function serverMessaging(clientsData) {
   // Gets all the Massage keys for all your friends
   if (clientsData.checkInType === "Friends") {
-    var dbType = { db: "Friends", dbTable: clientsData.uuID },
-      msgKeysData = await mySqlDB.DataTomySQL(clientsData, dbType);
-
-    // Sets uuID in the local msgKeys storage if not exists
-    if (!msgKeyStore[clientsData.uuID]) {
-      msgKeyStore[clientsData.uuID] = [];
-    }
-
-    // just getting the msgKey only
-    msgKeysData[3].forEach(element => {
-      msgKeyStore[clientsData.uuID].push(element.messageKey);
-    });
+    msgKeyStore[clientsData.uuID] = [];
+    msgKeyStore[clientsData.uuID].push(...clientsData.friends);
   }
 
   // Gets the chats messaging Data using Massage Keys
-  for (let key in msgKeyStore[clientsData.uuID]) {
-    key = msgKeyStore[clientsData.uuID][key];
-
+  for (const key of msgKeyStore[clientsData.uuID]) {
     var dbType = { db: "MSGChannel", dbTable: key };
     clientsData.checkInType = "Chats";
-    msgData = (await mySqlDB.DataTomySQL(clientsData, dbType))[3];
+    var msgData = (await dataBase.dataBaseHandler(clientsData, dbType))[3];
 
-    // Creates key in MSGChannel if not exists
-    // if (!MSGChannel[key]) {
-    //   MSGChannel[key] = [];
-    // }
-
-    MSGChannel[key] = [];
-    msgData.forEach(data => {
-      MSGChannel[key].push({
-        [data.name]: data.message,
-        timeStamp: data.timeStamp
-      });
-    });
+    tempChats[key] = []; 
+    for (const timeStamp of Object.keys(msgData).sort()) {
+      tempChats[key].push(msgData[timeStamp]);
+    }
   }
 
+  // console.log(tempChats)
   // If you have friends it will return an array of them else
-  if (Object.keys(MSGChannel) == "undefined") {
-    return "You Don't Have Friends!!";
-  } else {
-    delete MSGChannel.undefined;
-    return MSGChannel;
-  }
-}
+  // if (Object.keys(tempChats) == "undefined") {
+  //   return "You Don't Have Friends!!";
+  // } else {
+  //   delete MSGChannel.undefined;
+  //   return MSGChannel;
+  // }
 
-// Setting messages in the DB
+  return tempChats;
+}
+// --- // Sending messages in the DB
 async function sendMessage(clientsData, key) {
   var messageKey = clientsData.messageKey,
-    uuID = clientsData.uuID;
-
-  delete clientsData.messageKey;
-  delete clientsData.uuID;
-  // delete clientsData.uuID
+    uuID = clientsData.uuID,
+    checkInType = clientsData.checkInType,
+    dbType;
 
   //  Checks to see if the " messageKey " exist in MSGChannel MSQL table
   // If yes then use that particular key so the people you talk to can
@@ -73,7 +52,7 @@ async function sendMessage(clientsData, key) {
 
     clientsData.checkInType = "Chats";
     var dbType = { db: "MSGChannel", dbTable: messageKey },
-      msgData = (await mySqlDB.DataTomySQL(clientsData, dbType))[3];
+      msgData = (await dataBase.dataBaseHandler(clientsData, dbType))[3];
 
     //  Gettign the right key
     if (!msgData) {
@@ -83,21 +62,21 @@ async function sendMessage(clientsData, key) {
 
   clientsData.checkInType = "Register";
   var dbType = { db: "MSGChannel", dbTable: messageKey },
-    sendMSG = await mySqlDB.DataTomySQL(clientsData, dbType);
+    sendMSG = await dataBase.dataBaseHandler(clientsData, dbType);
 
   // Establishing friends in the DB
   var msgKeyExists = false;
   try {
-    msgKeyExists = msgKeyStore[key].includes(messageKey)?false:true;
+    msgKeyExists = msgKeyStore[key].includes(messageKey) ? false : true;
   } catch (error) {
-    msgKeyExists = true
+    msgKeyExists = true;
   }
 
   if (msgKeyExists) {
-    console.log("Now firends!!!!! !!!")
+    console.log("Now firends!!!!! !!!");
     var dbType = { db: "Friends", dbTable: key };
-    mySqlDB.DataTomySQL(
-      { messageKey: messageKey, checkInType: "Register" },
+    msgData = await dataBase.dataBaseHandler(
+      { [messageKey]: "", checkInType: "Register" },
       dbType
     );
 
@@ -106,7 +85,7 @@ async function sendMessage(clientsData, key) {
     msgKeyStore[key].push(messageKey);
   }
 
-  return { sendMSG, messageKey };
+  return messageKey;
 }
 
 module.exports = {
