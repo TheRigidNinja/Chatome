@@ -52,7 +52,7 @@ async function dataBaseHandler(Userdata, dbType) {
       delete Userdata.checkInType;
       user = Userdata;
     }
-    
+
     promise2 = new Promise((resolve, reject) => {
       db.collection(dbType.db)
         .doc(dbType.dbTable)
@@ -91,17 +91,47 @@ async function dataBaseHandler(Userdata, dbType) {
     });
   }
 
+  // Get user online Activities
+  if (Userdata.checkInType === "Activities") {
+    var dbDATA = await onlineActivities(dbType);
+
+    promise4 = new Promise((resolve, reject) => {
+      resolve(dbDATA);
+    });
+  }
+
   return Promise.all([promise1, promise2, promise3, promise4]);
 }
-
+// Gets DB DATA only if the value I'm looking for don't exists in "firebaseUserDATA"
 async function getUserDATA(dbType) {
-  // Gets DB DATA only if the value I'm looking for don't exists in "firebaseUserDATA"
   promise = new Promise((resolve, reject) => {
     db.collection(dbType.db)
       .doc(dbType.dbTable)
       .get()
       .then(snapshot => {
         resolve(snapshot.data());
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+
+  return await promise;
+}
+
+// Get online Activities
+async function onlineActivities(dbType) {
+  promise = new Promise((resolve, reject) => {
+    db.collection(dbType.db)
+      .get()
+      .then(snapshot => {
+        let docsData = {};
+
+        snapshot.docs.forEach(doc => {
+          docsData[doc.id] = Object.values(doc.data())[0];
+        });
+
+        resolve(docsData);
       })
       .catch(err => {
         reject(err);

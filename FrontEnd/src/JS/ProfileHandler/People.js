@@ -8,29 +8,32 @@ export default function InboxPeople({
   myDataID,
   latestChats
 }) {
-  var msgCnt = 0;
-
-  // console.log(LZString.decompress("঄〮⁜ॠ똠猂頞聖r䈍쀣ဆ牀㘀堁ꅀ临匠䄆ѐ᥀欀됂选䄆失ᰡ耑᐀頃먈铀Ⲁ愆ࠂ䦨䪽䛅는丐"))
+  var emojis = ["🙋", "😃", "🤗", "👋"],
+    myName = people[myDataID].userName,
+    chats = "",
+    timeStamp = "",
+    status;
 
   const People = () => {
     return people.map(data => {
-      var chats = " ",
-        timeStamp = " ",
-        status = data.status === "Online" ? "status" : "";
+      chats = `Say hello ${emojis[Math.floor(Math.random() * 4)]} to ${
+        data.userName
+      }`;
+      timeStamp = " ";
+      status = data.status === "Online" ? "status" : "";
 
       if (data.ID !== myDataID) {
-        if (typeof latestChats === "object") {
-          var myName = people[myDataID].userName,
-            myMsgKey = people[myDataID].messageKey,
-            key1 = myMsgKey + data.messageKey,
-            key2 = data.messageKey + myMsgKey,
-            check = latestChats[key2] ? latestChats[key2] : latestChats[key1];
+        if (latestChats !== undefined && latestChats[data.userName]) {
 
-          if (check !== undefined) {
-            var objKeys = Object.keys(check);
-            timeStamp = check.timeStamp;
-            chats = (objKeys[0] === myName ? "You: " : "") + check[objKeys[0]];
-          }
+          
+          let userDetail = latestChats[data.userName];
+          chats =
+            userDetail.name !== myName
+              ? " " + userDetail.message
+              : "You: " + userDetail.message;
+          timeStamp = userDetail.timeStamp;
+
+          console.log(chats);
         }
 
         return (
