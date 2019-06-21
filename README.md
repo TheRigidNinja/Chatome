@@ -3,7 +3,7 @@
 A React Chat web-app with Nodejs server and Socket.io as a bridge for realtime communication
 
 
-### ~~[Live Demo](##)~~
+### [Live Demo](https://chatapp-66db3.firebaseapp.com)
 
 
 
