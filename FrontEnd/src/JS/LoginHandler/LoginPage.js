@@ -236,7 +236,6 @@ class LoginPage extends Component {
                 placeholder="e.i: example@gmail.com"
                 id="email"
                 required
-                defaultValue={"brian.shisanya2000@gmail.com"}
               />
             </div>
 
@@ -246,7 +245,6 @@ class LoginPage extends Component {
                 type="password"
                 id="password"
                 required
-                defaultValue={123456}
               />
             </div>
 
