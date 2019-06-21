@@ -14,6 +14,7 @@ export default class ProfilePic extends Component {
   };
 
   componentDidMount() {
+
     // ----- // This function handles when user clicks on window ---> Its for toggling options menu when choosing avatar for your profile
     var elm = document.getElementById("root");
     elm.addEventListener("click", event => {

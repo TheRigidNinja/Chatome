@@ -4,8 +4,8 @@ import Fire from "../../FIREBASE/FBConfig";
 import { connect } from "react-redux";
 import ProfilePic from "./ProfilePic";
 import socket from "../Socket";
-import LZString from "lz-string";
 
+var pageToggle = 0;
 class LoginPage extends Component {
   state = {
     avatar: {
@@ -17,6 +17,13 @@ class LoginPage extends Component {
     },
     alert: { padding: 0 }
   };
+
+  componentDidMount(){
+    pageToggle+=1;
+    if(pageToggle >= 2){
+      window.location.reload();
+    }
+  }
 
   //----//  This function handles form submition --> It simply sends user content to props
   //----//  It also Takes user to the chat app home

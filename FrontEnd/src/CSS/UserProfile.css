@@ -240,6 +240,12 @@ time {
 .navFooter i {
   color: #b6bec5;
   padding: 0px 25px;
+  cursor: pointer;
+}
+
+.activeFooter {
+  color: #673ab7;
+  opacity: .8;
 }
 
 .userInfo img {

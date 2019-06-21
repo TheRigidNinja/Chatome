@@ -2,12 +2,12 @@ const express = require("express"),
   app = express(),
   http = require("http").Server(app),
   io = require("socket.io")(http),
-  profile = require("./HANDLERS/serveProfile"),
+  profile = require("./HANDLERS/ServeProfile"),
   messaging = require("./HANDLERS/ServeMessaging");
 
 var rooms = {},
-userDetails = {},
-subscribedRooms = [];
+  userDetails = {},
+  subscribedRooms = [];
 
 io.on("connection", socket => {
   // --- // Checks user name if taken
@@ -21,23 +21,23 @@ io.on("connection", socket => {
     let profileDataRetrieval = await profile.serveProfile(req);
 
     // You get all the data from everybody
-    socket.emit("returnUsersProfileDATA", profileDataRetrieval, key);
+    socket.emit("returnUsersProfileDATA", profileDataRetrieval,"None");
 
     // Everybody gets update about you
     socket.broadcast.emit(
       "returnUsersProfileDATA",
       (() => {
-        var onlineUser = profileDataRetrieval.mydata;
-        return profileDataRetrieval[onlineUser];
-      })()
+        var onlineUser = profileDataRetrieval.myDataID;
+        return profileDataRetrieval.people[onlineUser];
+      })(),"Broadcast"
     );
+
   });
 
   // --- // Message communication handler
   socket.on("UserDetails", res => {
     rooms[res.myName] = res.roomID;
-    userDetails[res.myName] = {id: res.id, uuID: res.uuID};
-
+    userDetails[res.myName] = { id: res.id, uuID: res.uuID };
   });
 
   // --- // Write messages to the DB
@@ -53,19 +53,19 @@ io.on("connection", socket => {
       }
 
       if (!/[|]/g.test(res.messageKey)) {
-        io.sockets.in(roomID).emit(roomID,res);
+        io.sockets.in(roomID).emit(roomID, res);
       } else {
         newFriend = true;
       }
     }
 
     // Sends message to the database
-    var sendMSG = await messaging.sendMessage(res, key,recipient);
+    var sendMSG = await messaging.sendMessage(res, key, recipient);
 
     // Only works if you are a new friends to the persorn who send the MSG
     if (newFriend === true) {
       res.messageKey = sendMSG;
-      io.sockets.in(roomID).emit(roomID,res);
+      io.sockets.in(roomID).emit(roomID, res);
     }
   });
 
@@ -77,21 +77,19 @@ io.on("connection", socket => {
 
   // Handle Disconnection
   socket.on("disconnect", async res => {
-
     var index = Object.values(rooms).indexOf(socket.id),
-    roomUserName = (Object.keys(rooms))[index];
+      roomUserName = Object.keys(rooms)[index];
 
-    console.log(userDetails[roomUserName]);
     if (userDetails[roomUserName]) {
-      var disc = await profile.disconnectHandler(userDetails[roomUserName].uuID);
+      var disc = await profile.disconnectHandler(
+        userDetails[roomUserName].uuID
+      );
       socket.broadcast.emit("UserOffline", userDetails[roomUserName].id);
 
       // Delete that user from object arrays
       delete rooms[roomUserName];
       delete subscribedRooms[roomUserName];
-      console.log(roomUserName,"was deleted from |");
-      console.log(rooms)
-      console.log(disc);
+      socket.leave(rooms[roomUserName]);
     }
   });
 });

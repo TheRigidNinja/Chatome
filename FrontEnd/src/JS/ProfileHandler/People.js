@@ -13,7 +13,7 @@ export default function InboxPeople({
     chats = "",
     timeStamp = "",
     status;
-
+    console.log(latestChats);
   const People = () => {
     return people.map(data => {
       chats = `Say hello ${emojis[Math.floor(Math.random() * 4)]} to ${
@@ -23,17 +23,16 @@ export default function InboxPeople({
       status = data.status === "Online" ? "status" : "";
 
       if (data.ID !== myDataID) {
+        // console.log(latestChats);
         if (latestChats !== undefined && latestChats[data.userName]) {
 
           
           let userDetail = latestChats[data.userName];
           chats =
-            userDetail.name !== myName
+            userDetail.recipient === myName
               ? " " + userDetail.message
               : "You: " + userDetail.message;
           timeStamp = userDetail.timeStamp;
-
-          console.log(chats);
         }
 
         return (
