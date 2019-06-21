@@ -5,8 +5,9 @@ const express = require("express"),
   profile = require("./HANDLERS/serveProfile"),
   messaging = require("./HANDLERS/ServeMessaging");
 
-var connectClients = {};
-var roomSubscribe = [];
+var rooms = {},
+userDetails = {},
+subscribedRooms = [];
 
 io.on("connection", socket => {
   // --- // Checks user name if taken
@@ -33,41 +34,64 @@ io.on("connection", socket => {
   });
 
   // --- // Message communication handler
+  socket.on("UserDetails", res => {
+    rooms[res.myName] = res.roomID;
+    userDetails[res.myName] = {id: res.id, uuID: res.uuID};
+
+  });
 
   // --- // Write messages to the DB
-  socket.on("SendMessage", async (res, key) => {
-    var sendMSG = await messaging.sendMessage(res, key);
+  socket.on("SendMessage", async (res, key, recipient) => {
+    var newFriend = false,
+      roomID = rooms[recipient.friend];
 
-    // Subscribe to a room
-    // if(!roomSubscribe.includes(sendMSG)){
-    //   socket.join(sendMSG)
-    //   roomSubscribe.push(sendMSG);
-    // }
+    if (roomID) {
+      // Subscribe to a room if needed
+      if (!subscribedRooms[recipient.friend]) {
+        socket.join(roomID);
+        subscribedRooms[recipient.friend] = "";
+      }
 
-    // io.sockets.in(sendMSG).emit(sendMSG,res);
+      if (!/[|]/g.test(res.messageKey)) {
+        io.sockets.in(roomID).emit(roomID,res);
+      } else {
+        newFriend = true;
+      }
+    }
 
-    socket.emit("FriendsMSG",res,sendMSG)
+    // Sends message to the database
+    var sendMSG = await messaging.sendMessage(res, key,recipient);
+
+    // Only works if you are a new friends to the persorn who send the MSG
+    if (newFriend === true) {
+      res.messageKey = sendMSG;
+      io.sockets.in(roomID).emit(roomID,res);
+    }
   });
 
   // // --- // Handles getting individual accounts MSG from DataBase
   socket.on("GetMessages", async (res, key) => {
     var msgData = await messaging.serverMessaging(res);
-    // console.log(msgData);
     io.emit("MSGChannel", msgData, key);
   });
 
   // Handle Disconnection
-  socket.on("ConnectClients", res => {
-    connectClients[socket.id] = res;
-  });
-
   socket.on("disconnect", async res => {
-    var disconnectKey = connectClients[socket.id];
-    if (disconnectKey) {
-      var disc = await profile.disconnectHandler(disconnectKey.uuID);
-      socket.broadcast.emit("UserOffline", disconnectKey.id);
 
-      delete disconnectKey;
+    var index = Object.values(rooms).indexOf(socket.id),
+    roomUserName = (Object.keys(rooms))[index];
+
+    console.log(userDetails[roomUserName]);
+    if (userDetails[roomUserName]) {
+      var disc = await profile.disconnectHandler(userDetails[roomUserName].uuID);
+      socket.broadcast.emit("UserOffline", userDetails[roomUserName].id);
+
+      // Delete that user from object arrays
+      delete rooms[roomUserName];
+      delete subscribedRooms[roomUserName];
+      console.log(roomUserName,"was deleted from |");
+      console.log(rooms)
+      console.log(disc);
     }
   });
 });

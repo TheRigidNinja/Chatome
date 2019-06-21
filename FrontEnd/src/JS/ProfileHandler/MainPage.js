@@ -41,8 +41,8 @@ class MainPage extends Component {
     }
 
     // Triggers get profile data for all users
-    this.getUsersProfileDATA(myDetails);
 
+    this.getUsersProfileDATA(myDetails);
 
     // Triggers When user goes offline
     socket.on("UserOffline", ID => {
@@ -55,10 +55,6 @@ class MainPage extends Component {
     });
   }
 
-  connectClients = (id,uuID) => {
-    socket.emit("ConnectClients", {id:id,uuID:uuID});
-  };
-
   //----// Getting all users profile data
   getUsersProfileDATA = myDetails => {
     let uuID = myDetails.uuID;
@@ -66,15 +62,10 @@ class MainPage extends Component {
 
     socket.on("returnUsersProfileDATA", (res, key) => {
       if (uuID === key || !key) {
-        this.setState(
-          {
-            ...this.state,
-            ...res
-          },
-          () => {
-            this.connectClients(this.state.myDataID,Cookie("GET", ["uuID"])[0]);
-          }
-        );
+        this.setState({
+          ...this.state,
+          ...res
+        });
       }
     });
   };
@@ -231,7 +222,7 @@ class MainPage extends Component {
                   togglePage={this.togglePage}
                   people={this.state.people}
                   myDataID={this.state.myDataID}
-                  latestChats={this.props.myDetails.LatestChats}
+                  latestChats={this.props.latestChats}
                 />
               </>
             );
@@ -303,8 +294,8 @@ const mapDispatchToProps = dispatch => {
 
 const mapStateToProps = state => {
   return {
-    myDetails: { ...state.ProfileDB }
-    // LatestChats: state.MessagingBoardDB.LatestChats
+    myDetails: { ...state.ProfileDB },
+    latestChats: state.ProfileDB.latestChats
   };
 };
 

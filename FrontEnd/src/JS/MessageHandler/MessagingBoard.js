@@ -24,25 +24,25 @@ class MessagingBoard extends Component {
 
     this.getMessage();
 
-    socket.on("FriendsMSG", (res,main,local) => {
+    // socket.on("FriendsMSG", (res, main, local) => {
+
+    //   console.log("object",res,main,local);
     //   var g = {
     //   ...this.state.chatRooms,
     //   // ...this.state.myMSGRoom,
     //   // ...res
     // }
-
     //   console.log(this.state.myMSGRoom[local],main)
-
-      // this.setState({
-      //   chatRooms: {
-      //     ...this.state.chatRooms,
-      //     [main]:{
-      //     ...this.state.chatRooms[main],
-      //     ...res
-      //   }
-      //   }
-      // });
-    });
+    // this.setState({
+    //   chatRooms: {
+    //     ...this.state.chatRooms,
+    //     [main]:{
+    //     ...this.state.chatRooms[main],
+    //     ...res
+    //   }
+    //   }
+    // });
+    // });
   }
 
   componentDidUpdate() {
@@ -57,6 +57,53 @@ class MessagingBoard extends Component {
       });
     }
   }
+
+  // Getting chats from database
+  getMessage = () => {
+    var uuID = Cookie("GET", ["uuID"])[0];
+    var friendsMSGKeys = {
+      checkInType: "Friends",
+      uuID: uuID,
+      friends: this.props.inboxState.friends
+    };
+
+    socket.emit("GetMessages", friendsMSGKeys, uuID);
+
+    // Waits for prov messages after emitting
+    socket.on("MSGChannel", (messages, key, action) => {
+      this.setState(
+        {
+          chatRooms: {
+            ...this.state.chatRooms,
+            ...messages
+          }
+        },
+        () => {
+          var lastChats = {};
+          for (const msgKey of Object.keys(this.state.chatRooms)) {
+            let msg = this.state.chatRooms[msgKey],
+              lastMSG = msg[msg.length - 1];
+
+            if (lastMSG) {
+              lastChats[lastMSG.recipient] = lastMSG;
+            }
+          }
+
+          this.props.latestChats(lastChats);
+
+          var myID = this.state.myDataID,
+            myDetail = {
+              myName: this.state.people[myID].userName,
+              roomID: socket.id,
+              id: myID,
+              uuID: Cookie("GET", ["uuID"])[0]
+            };
+
+          this.getFriendMessage(myDetail);
+        }
+      );
+    });
+  };
 
   // ----- // Scrolls
   messageScroll() {
@@ -75,111 +122,132 @@ class MessagingBoard extends Component {
     // console.log(elm.value.length );
   };
 
-  // Sending messange handler
-  handleMessagingActions = (myUserName, messageKey) => {
+  // ----- // Sending messange handler
+  handleMessagingActions = (myUserName, checkKey, key2) => {
+    var recipient = this.props.inboxState,
+      recipientName = {
+        friend: recipient.people[recipient.activeChatID].userName,
+        me: recipient.people[recipient.myDataID].userName
+      };
+
     var userMSGForm = {
       message: document.querySelector("#userMessage").value,
       checkInType: "Register",
-      messageKey: messageKey,
+      messageKey: checkKey,
       name: myUserName,
       uuID: Cookie("GET", ["uuID"])[0],
       timeStamp: Date.parse(new Date())
     };
 
-    // Server handler
-    this.sendMessage(userMSGForm, userMSGForm.messageKey);
+    // ----- // Server handler
+    this.sendMessage(userMSGForm, recipientName);
 
     delete userMSGForm.uuID;
     delete userMSGForm.messageKey;
     delete userMSGForm.checkInType;
 
+    var localMSG = this.state.myMSGRoom[key2];
+    localMSG = localMSG ? localMSG : [];
+
     this.setState(
       {
         myMSGRoom: {
           ...this.state.myMSGRoom,
-          [messageKey]: [...this.state.myMSGRoom[messageKey], userMSGForm]
+          [key2]: [...localMSG, userMSGForm]
         }
       },
       () => {
         document.querySelector("#userMessage").value = "";
+
+        // Gets the lastest chats and push them to props for people section
+        let lastChats = {};
+        for (const msgKey of Object.keys(this.state.myMSGRoom)) {
+          let msg = this.state.myMSGRoom[msgKey],
+            lastMSG = msg[msg.length - 1];
+
+          if (lastMSG) {
+            lastChats[lastMSG.name] = lastMSG;
+          }
+        }
+        this.props.latestChats({
+          ...this.props.profileDetails.latestChats,
+          ...lastChats
+        });
       }
     );
   };
 
-  // Send chat data to the server
-  sendMessage(msgData, messageKey) {
+  // ----- // Send chat data to the server
+  sendMessage(msgData, recipientName) {
     console.log("Sending");
-    socket.emit("SendMessage", msgData, msgData.uuID);
+    socket.emit("SendMessage", msgData, msgData.uuID, recipientName);
   }
 
-  // // Getting chats from database
-  getMessage = () => {
-    var uuID = Cookie("GET", ["uuID"])[0];
-    var friendsMSGKeys = {
-      checkInType: "Friends",
-      uuID: uuID,
-      friends: this.props.inboxState.friends
-    };
+  // ----- // Gets any messages from friends of people wanding to be friend
+  getFriendMessage = myDetail => {
+    // Emits my info to the server to so it can better identify myself
+    socket.emit("UserDetails", myDetail);
 
-    socket.emit("GetMessages", friendsMSGKeys, uuID);
+    socket.on(myDetail.roomID, res => {
+      let recipientData = res.messageKey;
+      if (recipientData) {
+        let myID = this.props.inboxState.myDataID,
+          myMSGkey = this.props.inboxState.people[myID].messageKey,
+          recipientKey = recipientData.replace(myMSGkey, ""),
+          key1 = recipientKey + myMSGkey,
+          key2 = myMSGkey + recipientKey,
+          localMsg1 = this.state.myMSGRoom[key1],
+          localMsg2 = this.state.myMSGRoom[key2],
+          localMSGDATA = [],
+          checkKey = "",
+          globalMSGDATA = this.state.chatRooms[recipientData];
+        globalMSGDATA = globalMSGDATA ? globalMSGDATA : [];
 
-    // Waits for prov messages after emitting
-    socket.on("MSGChannel", (messages, key, action) => {
-      this.setState({
-        chatRooms: {
-          ...this.state.chatRooms,
-          ...messages
+        // Checking for local MSG KEY
+        if (localMsg1) {
+          localMSGDATA = localMsg1;
+          checkKey = key1;
+        } else if (localMsg2) {
+          localMSGDATA = localMsg2;
+          checkKey = key2;
         }
-      });
+
+        delete res.uuID;
+        delete res.messageKey;
+        delete res.checkInType;
+        this.setState(
+          {
+            chatRooms: {
+              ...this.state.chatRooms,
+              [recipientData]: [...globalMSGDATA, ...localMSGDATA, res]
+            },
+            myMSGRoom: {
+              ...this.state.myMSGRoom,
+              [checkKey]: []
+            }
+          },
+          () => {
+            // Gets the lastest chats and push them to props for people section
+            let lastChats = {};
+            for (const msgKey of Object.keys(this.state.chatRooms)) {
+              let msg = this.state.chatRooms[msgKey],
+                lastMSG = msg[msg.length - 1];
+
+              if (lastMSG) {
+                lastChats[lastMSG.name] = lastMSG;
+              }
+            }
+
+            console.log(this.state.chatRooms);
+            this.props.latestChats({
+              ...this.props.profileDetails.latestChats,
+              ...lastChats
+            });
+          }
+        );
+      }
     });
   };
-
-  renderChats(res, key, action) {
-    // var uuID = Cookie("GET", ["uuID"])[0];
-    // try {
-    //   // console.log("Got Message -------->>>🤩🤩🤩", res);
-    //   if (uuID === key) {
-    //     var profile = this.props.inboxState;
-    //     var myID = profile.myDataID;
-    //     var myMessageKey = profile.people[myID].messageKey;
-    //     Object.keys(res).forEach(msgKey => {
-    //       if (!msgKey.includes(myMessageKey)) {
-    //         delete res[msgKey];
-    //       }
-    //     });
-    //   }
-    //   if (res) {
-    //     if (!action) {
-    //       this.setState({
-    //         messages: res
-    //       });
-    //     } else {
-    //       var tempMSG = this.state.messages[Object.keys(res)] || [];
-    //       tempMSG.push(res[Object.keys(res)][0]);
-    //       this.setState({
-    //         messages: {
-    //           ...this.state.messages,
-    //           [Object.keys(res)]: [...tempMSG]
-    //         }
-    //       });
-    //     }
-    //     //----// Set the first Message to Props so i can display it on people section
-    //     var tempMessages = {};
-    //     Object.keys(res).forEach(msg => {
-    //       tempMessages[msg] = res[msg][res[msg].length - 1];
-    //     });
-    //     this.setState({
-    //       tempMessages: {
-    //         ...this.state.tempMessages,
-    //         ...tempMessages
-    //       }
-    //     });
-    //     this.props.latestChats(this.state.tempMessages);
-    //   }
-    // } catch (err) {
-    //   console.log("Erro Trying to Fetch Messages ====>>>>", err);
-    // }
-  }
 
   render() {
     var inboxState = this.props.inboxState,
@@ -218,15 +286,9 @@ class MessagingBoard extends Component {
         messageData = [];
       }
 
-      var myChats = this.state.myMSGRoom[key2];
-      if (!myChats) {
-        this.setState({
-          myMSGRoom: { ...this.state.myMSGRoom, [key2]: [] }
-        });
-        myChats = [];
-      }
-
       // Marges messages from my local chat and the updated friend chat
+      var myChats = this.state.myMSGRoom[key2];
+      myChats = myChats ? myChats : [];
       messageData = [...messageData, ...myChats];
     }
 
@@ -280,7 +342,7 @@ class MessagingBoard extends Component {
                 className="fas fa-paper-plane"
                 id="submitMessage"
                 onClick={() =>
-                  this.handleMessagingActions(myUserName, checkKey)
+                  this.handleMessagingActions(myUserName, checkKey, key2)
                 }
               />
             </div>

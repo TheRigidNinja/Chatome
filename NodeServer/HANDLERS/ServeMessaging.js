@@ -14,8 +14,9 @@ async function serverMessaging(clientsData) {
     var dbType = { db: "MSGChannel", dbTable: key };
     clientsData.checkInType = "Chats";
     var msgData = (await dataBase.dataBaseHandler(clientsData, dbType))[3];
+    msgData = msgData ? msgData : [];
+    tempChats[key] = [];
 
-    tempChats[key] = []; 
     for (const timeStamp of Object.keys(msgData).sort()) {
       tempChats[key].push(msgData[timeStamp]);
     }
@@ -33,7 +34,7 @@ async function serverMessaging(clientsData) {
   return tempChats;
 }
 // --- // Sending messages in the DB
-async function sendMessage(clientsData, key) {
+async function sendMessage(clientsData, key, recipient) {
   var messageKey = clientsData.messageKey,
     uuID = clientsData.uuID,
     checkInType = clientsData.checkInType,
@@ -74,7 +75,14 @@ async function sendMessage(clientsData, key) {
 
   if (msgKeyExists) {
     console.log("Now firends!!!!! !!!");
-    var dbType = { db: "Friends", dbTable: key };
+    var dbType = { db: "Friends", dbTable: recipient.friend };
+    msgData = await dataBase.dataBaseHandler(
+      { [messageKey]: "", checkInType: "Register" },
+      dbType
+    );
+
+    // My key
+    var dbType = { db: "Friends", dbTable: recipient.me };
     msgData = await dataBase.dataBaseHandler(
       { [messageKey]: "", checkInType: "Register" },
       dbType

@@ -9,7 +9,7 @@ async function serveProfile(clientsData) {
   if (clientsData.checkInType == "Login") {
     return await handleGetDATA(clientsData);
   } else if (clientsData.checkInType == "Register") {
-    let register = await handleSetDATA(clientsData,uuID);
+    let register = await handleSetDATA(clientsData, uuID);
 
     if (register[1] === "Done Creating!!!") {
       clientsData.checkInType = "Login";
@@ -33,24 +33,35 @@ async function handleGetDATA(clientsData) {
     dbType = { db: "ProfileData", dbTable: "PublicUserData" };
     const respData = (await dataBase.dataBaseHandler(clientsData, dbType))[3];
 
-    dbType = { db: "Friends", dbTable: clientsData.uuID };
+    dbType = { db: "Friends", dbTable: respData[clientsData.uuID].userName };
     var friendList = (await dataBase.dataBaseHandler(clientsData, dbType))[3];
 
     const friendsData = friendList ? Object.keys(friendList) : "";
     var uuIDKeys = Object.keys(respData);
 
     // Setting up online status
-    var Activities = { checkInType: "Register", status: true };
-
+    var Activities = { checkInType: "Register", status: "Online" };
     dbType = { db: "Activities", dbTable: clientsData.uuID };
     await dataBase.dataBaseHandler(Activities, dbType);
+
+    var Activities = { checkInType: "Activities", status: "Online" };
+    dbType = { db: "Activities", dbTable: clientsData.uuID };
+    var onlineActivity = (await dataBase.dataBaseHandler(
+      Activities,
+      dbType
+    ))[3];
 
     return {
       people: (() => {
         let userData = [],
           idCnt = 0;
+
         uuIDKeys.forEach(elm => {
           respData[elm]["ID"] = idCnt;
+          if (!onlineActivity[elm] && onlineActivity[elm] !== "Online") {
+            respData[elm].status = "Offline";
+          }
+
           idCnt++;
           userData.push({ ...respData[elm] });
         });
@@ -63,7 +74,7 @@ async function handleGetDATA(clientsData) {
   }
 }
 
-async function handleSetDATA(clientsData,uuID) {
+async function handleSetDATA(clientsData, uuID) {
   var dbType = { db: "ProfileData", dbTable: "PublicUserData" };
   var setDATA = await dataBase.dataBaseHandler(clientsData, dbType);
 
@@ -87,7 +98,9 @@ async function handleSetDATA(clientsData,uuID) {
 
 // Updating user online status
 async function disconnectHandler(uuID) {
-  var Activities = { checkInType: "Register", status: false };
+
+  console.log("=++>",uuID)
+  var Activities = { checkInType: "Register", status: "Offline" };
   dbType = { db: "Activities", dbTable: uuID };
   var setUser = await dataBase.dataBaseHandler(Activities, dbType);
 

@@ -1,4 +1,5 @@
-const initState = {};
+const initState = {
+};
 
 const ProfileReducer = (state = initState, action) => {
   if (action.type === "UPDATE") {
@@ -11,7 +12,7 @@ const ProfileReducer = (state = initState, action) => {
   if(action.type === "LATESTCHATS"){
     return {
       ...state,
-      LatestChats: action.stutas
+      latestChats: action.stutas
     };  
   }
 
