@@ -7,10 +7,9 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-// // THIS IS A FIREBASE DB FUNCTION PROCESSOR
-// // This function tries to emulate out put data like MYSQL FUNCTION over in "MySQLDB.js"
-// // Its an easy way to do things without breaking other function that relays on mysql data format
-
+// THIS IS A FIREBASE DB FUNCTION PROCESSOR
+// This function tries to emulate out put data like MYSQL FUNCTION over in "MySQLDB.js"
+// Its an easy way to do things without breaking other function that relays on mysql data format
 async function dataBaseHandler(Userdata, dbType) {
   var promise1, promise2, promise3, promise4, dbDATA, dbExportDATA;
 
