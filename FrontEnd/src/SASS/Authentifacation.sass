@@ -107,7 +107,6 @@
     border-radius: 2px
     padding: 12px
     width: 100%
-    // font-size: 10px
 
 .LoginSection input[type="submit"]
     position: relative
@@ -139,3 +138,32 @@
 .LoginSection input:focus
     outline: none
     border: 1px solid #ee4180c5
+
+
+/* --------------- Check box!!!  --------------- */
+.styled-checkbox 
+  position: absolute
+  opacity: 0
+
+  // Box.
+  & + label:before 
+    transition: all .2s
+    content: ''
+    margin-right: 10px
+    display: inline-block
+    vertical-align: text-top
+    width: 20px
+    height: 20px
+    border-radius: 2px
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.12)
+    background: #5a50a5d9
+
+  
+  // Box hover
+  &:hover + label:before, &:focus + label:before 
+     box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.12)
+  
+  // Box checked
+  &:checked + label:before 
+    background: #ef4180
+    border-radius: 50%

@@ -18,9 +18,9 @@ class LoginPage extends Component {
     alert: { padding: 0 }
   };
 
-  componentDidMount(){
-    pageToggle+=1;
-    if(pageToggle >= 2){
+  componentDidMount() {
+    pageToggle += 1;
+    if (pageToggle >= 2) {
       window.location.reload();
     }
   }
@@ -67,7 +67,8 @@ class LoginPage extends Component {
       userLabel = dom[1];
 
     if (userName.offsetHeight === 0) {
-      userLabel.removeAttribute("required");
+      userLabel.setAttribute("required","required");
+
       // formgroup
       this.setState({
         avatar: {
@@ -210,10 +211,13 @@ class LoginPage extends Component {
             </div>
 
             <div className="form-group">
-              <input type="checkbox" onChange={this.RegisterBox} id="check1" />
-              <label className="form-check-label" htmlFor="check1">
-                - I'm new to this!!!
-              </label>
+              <input
+                className="styled-checkbox"
+                id="check1"
+                type="checkbox"
+                onChange={this.RegisterBox}
+              />
+              <label htmlFor="check1"> I'm new to this!!!</label>
             </div>
 
             <div
@@ -221,19 +225,14 @@ class LoginPage extends Component {
               style={this.state.userNameStyle}
             >
               <label>*User Name</label>
-              <input
-                type="text"
-                placeholder="e.i: Smaff56"
-                id="userLabel"
-                defaultValue={"user56"}
-              />
+              <input type="text" placeholder="e.g: Smaff56" id="userLabel" />
             </div>
 
             <div className="form-group">
               <label>*Email</label>
               <input
                 type="email"
-                placeholder="e.i: example@gmail.com"
+                placeholder="e.g: example@gmail.com"
                 id="email"
                 required
               />
@@ -241,11 +240,7 @@ class LoginPage extends Component {
 
             <div className="form-group">
               <label>*Password </label>
-              <input
-                type="password"
-                id="password"
-                required
-              />
+              <input type="password" id="password" required />
             </div>
 
             <input type="submit" id="Submit" />

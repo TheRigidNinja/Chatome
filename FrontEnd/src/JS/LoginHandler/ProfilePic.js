@@ -14,7 +14,6 @@ export default class ProfilePic extends Component {
   };
 
   componentDidMount() {
-
     // ----- // This function handles when user clicks on window ---> Its for toggling options menu when choosing avatar for your profile
     var elm = document.getElementById("root");
     elm.addEventListener("click", event => {
@@ -128,33 +127,36 @@ export default class ProfilePic extends Component {
   // ----- // Reveals / Hides more option when taking profile photos
   revealOptions = (event, action) => {
     if (
-      (action === "window" && this.state.options.width !== "54.4px") ||
-      event.target.className === "fas fa-th-large" ||
-      event.target.className === "uploadMethods"
+      event.target.className === "fas fa-hand-point-right" ||
+      this.state.options.width !== "54.4px"
     ) {
-      var left = null,
-        width = null;
-      if (this.state.options.width === "54.4px") {
+      var left = "calc(100% - 79px)",
+        width = "54.4px";
+
+      if (
+        event.target.className === "fas fa-hand-point-right" &&
+        this.state.options.width !== "231px"
+      ) {
         left = "calc(100% - 216px)";
         width = "231px";
-      } else {
-        left = "calc(100% - 79px)";
-        width = "54.4px";
       }
-    } else if (
+
+      this.setState({
+        options: {
+          left: left,
+          width: width
+        }
+      });
+    }
+
+    // Reset the toggled button
+    if (
       !["SubmitLink", "urlImage", "uploadImage"].includes(
         event.target.className
       )
     ) {
       this.defaultPage();
     }
-
-    this.setState({
-      options: {
-        left: left,
-        width: width
-      }
-    });
   };
 
   render() {
@@ -250,7 +252,10 @@ export default class ProfilePic extends Component {
         return (
           <>
             <div className="uploadMethods" style={this.state.options}>
-              <i class="fas fa-th-large" onClick={this.revealOptions} />
+              <i
+                className="fas fa-hand-point-right"
+                onClick={this.revealOptions}
+              />
               <i className="fas fa-camera-retro" onClick={this.toggleCamera} />
               <i className="fas fa-upload" onClick={this.uploadImage} />
               <i className="fas fa-link" onClick={this.linkedImage} />

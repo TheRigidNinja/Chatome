@@ -1,6 +1,5 @@
 import React from "react";
-import LZString from "lz-string";
-import { async } from "q";
+// import LZString from "lz-string";
 
 export default function InboxPeople({
   people,
@@ -12,8 +11,9 @@ export default function InboxPeople({
     myName = people[myDataID].userName,
     chats = "",
     timeStamp = "",
-    status;
-    console.log(latestChats);
+    status,
+    paragraphStyle = {};
+
   const People = () => {
     return people.map(data => {
       chats = `Say hello ${emojis[Math.floor(Math.random() * 4)]} to ${
@@ -21,18 +21,20 @@ export default function InboxPeople({
       }`;
       timeStamp = " ";
       status = data.status === "Online" ? "status" : "";
+      paragraphStyle = {"font-weight": "700", "opacity": ".8"};
 
       if (data.ID !== myDataID) {
-        // console.log(latestChats);
         if (latestChats !== undefined && latestChats[data.userName]) {
-
-          
           let userDetail = latestChats[data.userName];
-          chats =
-            userDetail.recipient === myName
-              ? " " + userDetail.message
-              : "You: " + userDetail.message;
-          timeStamp = userDetail.timeStamp;
+
+          // paragraphStyle
+          // Check to see if the text is from you or your friend
+          if (userDetail.recipient === myName) {
+            chats = " " + userDetail.message;
+          } else {
+            paragraphStyle = {};
+            chats = "You: " + userDetail.message;
+          }
         }
 
         return (
@@ -48,7 +50,7 @@ export default function InboxPeople({
               </span>
               <div className="details">
                 <h4>{data.userName}</h4>
-                <p>{chats}</p>
+                <p style={paragraphStyle}>{chats}</p>
               </div>
               <time>{timeStamp}</time>
             </div>

@@ -24,7 +24,7 @@ body, #root {
 
 body, #root {
   overflow: hidden;
-  font-family: Calibre, "Helvetica Neue", "Segoe UI", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 ul {
