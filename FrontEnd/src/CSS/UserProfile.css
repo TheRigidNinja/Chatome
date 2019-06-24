@@ -111,7 +111,7 @@ input[type="search"] {
 .Onlineperson h6 {
   font-size: 12px;
   color: #0000009f;
-  font-weight: 400;
+  font-weight: regular;
   width: 70px;
   overflow: hidden;
   white-space: nowrap;
@@ -199,11 +199,16 @@ time {
   -webkit-box-align: start;
       -ms-flex-align: start;
           align-items: flex-start;
+  white-space: nowrap;
   overflow: hidden;
 }
 
 .details h4 {
   font-size: 20px;
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-weight: 700;
 }
 
 .details p {
@@ -240,6 +245,12 @@ time {
 .navFooter i {
   color: #b6bec5;
   padding: 0px 25px;
+  cursor: pointer;
+}
+
+.activeFooter {
+  color: #673ab7;
+  opacity: .8;
 }
 
 .userInfo img {

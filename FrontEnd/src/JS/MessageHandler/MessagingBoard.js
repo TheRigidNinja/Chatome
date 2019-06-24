@@ -79,13 +79,20 @@ class MessagingBoard extends Component {
           }
         },
         () => {
-          var lastChats = {};
+          var lastChats = {},
+            myName = this.state.people[this.state.myDataID].userName;
+
           for (const msgKey of Object.keys(this.state.chatRooms)) {
             let msg = this.state.chatRooms[msgKey],
               lastMSG = msg[msg.length - 1];
 
-            if (lastMSG) {
-              lastChats[lastMSG.recipient] = lastMSG;
+            if (
+              lastMSG &&
+              (lastMSG.recipient === myName || lastMSG.name === myName)
+            ) {
+              let nameSort =
+                lastMSG.recipient === myName ? lastMSG.name : lastMSG.recipient;
+              lastChats[nameSort] = lastMSG;
             }
           }
 
@@ -135,6 +142,7 @@ class MessagingBoard extends Component {
       checkInType: "Register",
       messageKey: checkKey,
       name: myUserName,
+      recipient: recipientName.friend,
       uuID: Cookie("GET", ["uuID"])[0],
       timeStamp: Date.parse(new Date())
     };
@@ -160,15 +168,23 @@ class MessagingBoard extends Component {
         document.querySelector("#userMessage").value = "";
 
         // Gets the lastest chats and push them to props for people section
-        let lastChats = {};
+        var lastChats = {},
+          myName = this.state.people[this.state.myDataID].userName;
+
         for (const msgKey of Object.keys(this.state.myMSGRoom)) {
           let msg = this.state.myMSGRoom[msgKey],
             lastMSG = msg[msg.length - 1];
 
-          if (lastMSG) {
-            lastChats[lastMSG.name] = lastMSG;
+          if (
+            lastMSG &&
+            (lastMSG.recipient === myName || lastMSG.name === myName)
+          ) {
+            let nameSort =
+              lastMSG.recipient === myName ? lastMSG.name : lastMSG.recipient;
+            lastChats[nameSort] = lastMSG;
           }
         }
+
         this.props.latestChats({
           ...this.props.profileDetails.latestChats,
           ...lastChats
@@ -215,6 +231,7 @@ class MessagingBoard extends Component {
         delete res.uuID;
         delete res.messageKey;
         delete res.checkInType;
+
         this.setState(
           {
             chatRooms: {
@@ -228,17 +245,24 @@ class MessagingBoard extends Component {
           },
           () => {
             // Gets the lastest chats and push them to props for people section
-            let lastChats = {};
+            var lastChats = {},
+              myName = this.state.people[this.state.myDataID].userName;
+
             for (const msgKey of Object.keys(this.state.chatRooms)) {
               let msg = this.state.chatRooms[msgKey],
                 lastMSG = msg[msg.length - 1];
 
-              if (lastMSG) {
-                lastChats[lastMSG.name] = lastMSG;
+              if (
+                lastMSG &&
+                (lastMSG.recipient === myName || lastMSG.name === myName)
+              ) {
+                let nameSort =
+                  lastMSG.recipient === myName
+                    ? lastMSG.name
+                    : lastMSG.recipient;
+                lastChats[nameSort] = lastMSG;
               }
             }
-
-            console.log(this.state.chatRooms);
             this.props.latestChats({
               ...this.props.profileDetails.latestChats,
               ...lastChats

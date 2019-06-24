@@ -92,7 +92,7 @@ input[type="search"]
     h6
         font-size: 12px
         color: #0000009f
-        font-weight: 400
+        font-weight: regular
         width: 70px
         overflow: hidden
         white-space: nowrap
@@ -162,10 +162,15 @@ time
     display: flex
     flex-flow: column
     align-items: flex-start
+    white-space: nowrap
     overflow: hidden
 
     h4
         font-size: 20px
+        width: 100%
+        text-overflow: ellipsis
+        overflow: hidden
+        font-weight: 700
 
 
 .details p
@@ -176,7 +181,6 @@ time
     margin: 0px
     max-width: 100%
     display: inline-block
-
 
 .navFooter
     width: 100%
@@ -196,6 +200,12 @@ time
     i
         color: #b6bec5
         padding: 0px 25px
+        cursor: pointer
+
+.activeFooter
+    color: rgb(103, 58, 183)
+    opacity: .8
+
 
 .userInfo img
     width: 50px

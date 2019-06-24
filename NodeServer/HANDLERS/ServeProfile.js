@@ -1,4 +1,4 @@
-const dataBase = require("../HANDLERS/FIREBASE_HANDLER/FirebaseDB"); //require("./MySQLDB");
+const dataBase = require("./FIREBASE_HANDLER/FirebaseDB"); //require("./MySQLDB");
 // All user names
 var namesDB = [];
 
@@ -51,24 +51,44 @@ async function handleGetDATA(clientsData) {
       dbType
     ))[3];
 
+
+    myDataID = null;
+
     return {
       people: (() => {
         let userData = [],
-          idCnt = 0;
+          idCnt = 0,
+          dateSort = [],
+          peopleDate = {};
 
+        // Putting people in order by timestamp
         uuIDKeys.forEach(elm => {
-          respData[elm]["ID"] = idCnt;
-          if (!onlineActivity[elm] && onlineActivity[elm] !== "Online") {
-            respData[elm].status = "Offline";
+          let createdDATE = respData[elm].accountCreatedDATE;
+          dateSort.push(createdDATE);
+          peopleDate[createdDATE] = { ...respData[elm], uuID: elm };
+        });
+
+        dateSort.sort().forEach(elm => {
+          peopleDate[elm]["ID"] = idCnt;
+          let uuID = peopleDate[elm].uuID;
+
+          if (myDataID === null && clientsData.uuID === uuID) {
+            myDataID = idCnt;
+          }
+          // Giving iDs to people
+          
+          if (onlineActivity[uuID] !== "Online") {
+            peopleDate[elm].status = "Offline";
           }
 
           idCnt++;
-          userData.push({ ...respData[elm] });
+          delete peopleDate[elm].uuID;
+          userData.push({ ...peopleDate[elm] });
         });
 
         return userData;
       })(),
-      myDataID: uuIDKeys.indexOf(clientsData.uuID),
+      myDataID: myDataID,
       friends: friendsData
     };
   }
@@ -98,8 +118,7 @@ async function handleSetDATA(clientsData, uuID) {
 
 // Updating user online status
 async function disconnectHandler(uuID) {
-
-  console.log("=++>",uuID)
+  // console.log("===>", uuID);
   var Activities = { checkInType: "Register", status: "Offline" };
   dbType = { db: "Activities", dbTable: uuID };
   var setUser = await dataBase.dataBaseHandler(Activities, dbType);

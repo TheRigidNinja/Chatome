@@ -47,11 +47,13 @@ class MainPage extends Component {
     // Triggers When user goes offline
     socket.on("UserOffline", ID => {
       var people = this.state.people;
-      people[ID].status = "Offline";
 
-      this.setState({
-        people: people
-      });
+      if (people) {
+        people[ID].status = "Offline";
+        this.setState({
+          people: people
+        });
+      }
     });
   }
 
@@ -60,56 +62,29 @@ class MainPage extends Component {
     let uuID = myDetails.uuID;
     socket.emit("getUsersProfileDATA", myDetails, uuID);
 
-    socket.on("returnUsersProfileDATA", (res, key) => {
-      if (uuID === key || !key) {
+    socket.on("returnUsersProfileDATA", (res, action) => {
+      if (action === "None") {
         this.setState({
           ...this.state,
           ...res
+        });
+      } else if (action === "Broadcast") {
+        console.log(res);
+        let updatedData = this.state.people;
+        updatedData[res.ID] = res;
+
+        this.setState({
+          people: [...updatedData]
         });
       }
     });
   };
 
-  // // Sets All user data to local state
-  // Socket().on("AllProfileData", (res, key) => {
-
-  //   console.log(res);
-  //   try {
-  //     // Only show frieds in the state if have the key
-  //     var friendsDATA = "",
-  //       myID = "";
-  //     if (key === myDetails.uuID) {
-  //       friendsDATA = res.friends[3];
-  //       myID = res.myData[3][0].ID - 1;
-  //     }
-
-  //     this.setState({
-  //       ...this.state,
-  //       myDataID: myID === "" ? this.state.myDataID : myID,
-  //       people: res.profile[3],
-  //       friends: friendsDATA === "" ? this.state.friends : friendsDATA
-  //     });
-  //   } catch (error) {
-  //     console.log("Failed to get Info from server ========>>>", error);
-  //   }
-  //   // var data = JSON.stringify(res);
-  // });
-  // alert("--")
-  //     // Trigger when window closes
-  //     this.addEventListener("beforeunload", ()=> {
-
-  //       Socket().emit("UserOffline", "myDetails.uuID");
-
-  //     });
-
-  // window.onbeforeunload = function() {
-  //   Socket().emit("UserOffline", "myDetails.uuID");
-  // }
-
-  // }
-
   //----// Handling Page toggle from "MessagingBoard","Friends" and "Inbox"
   togglePage = (PageType, activeChatID) => {
+    let event = activeChatID;
+    console.log(PageType);
+
     switch (PageType) {
       // Toggles to MessagingBoard
       case "MessagingBoard":
@@ -124,6 +99,23 @@ class MainPage extends Component {
         this.setState({
           toggleType: "MainPage"
         });
+        break;
+
+      case "Inbox":
+          this.setState({
+            toggleType: "Inbox"
+          });
+        break;
+      case "Friends":
+          this.setState({
+            toggleType: "Friends"
+          });
+        break;
+
+      case "Profile":
+          this.setState({
+            toggleType: "MyProfile"
+          });
         break;
     }
   };
@@ -151,29 +143,23 @@ class MainPage extends Component {
         Footer = () => {
           return (
             <>
-              <a
-                href="##inbox"
+              <i
+                className="fas fa-comment-dots"
                 id="inbox"
-                onClick={() => this.togglePage("Inbox")}
-              >
-                <i className="fas fa-comment-dots" />
-              </a>
+                onClick={e => this.togglePage("Inbox", e)}
+              />
 
-              <a
-                href="##friends"
+              <i
+                className="fas fa-address-book"
                 id="friends"
-                onClick={() => this.togglePage("Friends")}
-              >
-                <i className="fas fa-address-book" />
-              </a>
+                onClick={e => this.togglePage("Friends", e)}
+              />
 
-              <a
-                href="##profile"
+              <i
+                className="fas fa-user"
                 id="profile"
-                onClick={() => this.togglePage("Profile")}
-              >
-                <i className="fas fa-user" />
-              </a>
+                onClick={e => this.togglePage("Profile", e)}
+              />
             </>
           );
         };
@@ -186,7 +172,7 @@ class MainPage extends Component {
           break;
 
         case "Friends":
-          Friends = () => {
+            FriendsDashBoard = () => {
             return <Friends />;
           };
           break;
@@ -250,7 +236,7 @@ class MainPage extends Component {
 
               {/* Display People that have ever created an account */}
               <div className="inboxSection">
-                <input type="search" placeholder="search" onChange={0} />
+                <input type="search" placeholder="search by name" onChange={0} />
                 <InboxElements />
               </div>
 

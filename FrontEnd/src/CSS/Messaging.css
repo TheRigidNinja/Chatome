@@ -95,12 +95,14 @@
   top: 0px;
   padding: 100px 15px;
   -webkit-overflow-scrolling: touch;
+  -ms-touch-action: touch;
+      touch-action: touch;
 }
 
 .msgDashboard label {
-  font-size: 9px;
+  font-size: 10px;
   margin: -15px 0px 0px 15px;
-  opacity: .5;
+  opacity: .6;
   font-weight: bold;
   position: absolute;
 }
@@ -135,12 +137,26 @@
 }
 
 .replyMessage time, .sentMessage time {
+  -webkit-transition: all .1s;
+  transition: all .1s;
   text-align: center !important;
   width: 100%;
+  height: 0px;
+  opacity: 0;
 }
 
 .replyMessage div, .sentMessage div {
   padding: 10px 0px;
+}
+
+.replyMessage:active time, .replyMessage:hover time {
+  opacity: .6;
+  height: 30px;
+}
+
+.sentMessage:active time, .sentMessage:hover time {
+  opacity: .6;
+  height: 30px;
 }
 
 .sentMessage div {
@@ -154,7 +170,12 @@
 }
 
 .sentMessage label {
-  margin: -15px 0px 0px -20px;
+  width: 100%;
+  padding: 0px;
+  margin: 0px;
+  left: 0px;
+  text-align: end;
+  margin: -15px -10px;
 }
 
 .sentMessage p {
@@ -167,7 +188,7 @@
   height: 25px;
   border-radius: 50%;
   top: 10px;
-  margin-right: 3px;
+  margin-right: 10px;
   padding: 0px;
 }
 

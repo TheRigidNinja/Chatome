@@ -156,3 +156,34 @@
   outline: none;
   border: 1px solid #ee4180c5;
 }
+
+/* --------------- Check box!!!  --------------- */
+.styled-checkbox {
+  position: absolute;
+  opacity: 0;
+}
+
+.styled-checkbox + label:before {
+  -webkit-transition: all .2s;
+  transition: all .2s;
+  content: '';
+  margin-right: 10px;
+  display: inline-block;
+  vertical-align: text-top;
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  -webkit-box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.12);
+          box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.12);
+  background: #5a50a5d9;
+}
+
+.styled-checkbox:hover + label:before, .styled-checkbox:focus + label:before {
+  -webkit-box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.12);
+          box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.12);
+}
+
+.styled-checkbox:checked + label:before {
+  background: #ef4180;
+  border-radius: 50%;
+}

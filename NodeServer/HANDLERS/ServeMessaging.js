@@ -9,6 +9,7 @@ async function serverMessaging(clientsData) {
     msgKeyStore[clientsData.uuID].push(...clientsData.friends);
   }
 
+
   // Gets the chats messaging Data using Massage Keys
   for (const key of msgKeyStore[clientsData.uuID]) {
     var dbType = { db: "MSGChannel", dbTable: key };
@@ -21,15 +22,6 @@ async function serverMessaging(clientsData) {
       tempChats[key].push(msgData[timeStamp]);
     }
   }
-
-  // console.log(tempChats)
-  // If you have friends it will return an array of them else
-  // if (Object.keys(tempChats) == "undefined") {
-  //   return "You Don't Have Friends!!";
-  // } else {
-  //   delete MSGChannel.undefined;
-  //   return MSGChannel;
-  // }
 
   return tempChats;
 }
