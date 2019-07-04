@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import "../../CSS/Messaging.css";
-import Chats from "./Chats";
+import Texts from "./Texts";
 import socket from "../Socket";
 import { connect } from "react-redux";
 import Cookie from "../Cookie";
-import LZString from "lz-string";
+// import LZString from "lz-string";
+import PhoneCall from "./PhoneCall/PhoneCall";
+import TextArea from "./TextingHandler";
 
 class MessagingBoard extends Component {
   state = {
@@ -13,63 +15,40 @@ class MessagingBoard extends Component {
     textAreaStyle: {
       height: "35px"
     },
-    textHeight: false
+    textHeight: false,
+    togglePhoneCall: false,
+    phoneType: null,
+    PhoneCallStyle: {
+      "z-index": "-1"
+    }
   };
 
   componentWillMount() {
-    this.setState({
-      ...this.state,
-      ...this.props.inboxState
-    });
-
-    this.getMessage();
-
-    // socket.on("FriendsMSG", (res, main, local) => {
-
-    //   console.log("object",res,main,local);
-    //   var g = {
-    //   ...this.state.chatRooms,
-    //   // ...this.state.myMSGRoom,
-    //   // ...res
-    // }
-    //   console.log(this.state.myMSGRoom[local],main)
-    // this.setState({
-    //   chatRooms: {
-    //     ...this.state.chatRooms,
-    //     [main]:{
-    //     ...this.state.chatRooms[main],
-    //     ...res
-    //   }
-    //   }
-    // });
-    // });
+    // Tries to get User MSG after Page loads from server
+    this.initialGetMessageFromServer();
   }
 
   componentDidUpdate() {
-    // Works scrolls down every time you post a message
+    console.log("object");
     if (this.props.inboxState.toggleType === "MessagingBoard") {
+      // Scrolls message Board
       this.messageScroll();
-
-      var textArea = document.querySelector("#userMessage");
-
-      textArea.addEventListener("input", () => {
-        this.textAreaHandler(textArea);
-      });
     }
   }
 
-  // Getting chats from database
-  getMessage = () => {
-    var uuID = Cookie("GET", ["uuID"])[0];
-    var friendsMSGKeys = {
-      checkInType: "Friends",
-      uuID: uuID,
-      friends: this.props.inboxState.friends
-    };
+  // This is the process of getting Pre- Messages from Online DataBase
+  initialGetMessageFromServer = () => {
+    var uuID = Cookie("GET", ["uuID"])[0],
+      friendsMSGKeys = {
+        checkInType: "Friends",
+        uuID: uuID,
+        friends: this.props.inboxState.friends
+      };
 
+    // The Socket that triggers A server Function to get Messages
     socket.emit("GetMessages", friendsMSGKeys, uuID);
 
-    // Waits for prov messages after emitting
+    // Waits for prov Messages after emitting
     socket.on("MSGChannel", (messages, key, action) => {
       this.setState(
         {
@@ -79,133 +58,74 @@ class MessagingBoard extends Component {
           }
         },
         () => {
-          var lastChats = {},
-            myName = this.state.people[this.state.myDataID].userName;
-
-          for (const msgKey of Object.keys(this.state.chatRooms)) {
-            let msg = this.state.chatRooms[msgKey],
-              lastMSG = msg[msg.length - 1];
-
-            if (
-              lastMSG &&
-              (lastMSG.recipient === myName || lastMSG.name === myName)
-            ) {
-              let nameSort =
-                lastMSG.recipient === myName ? lastMSG.name : lastMSG.recipient;
-              lastChats[nameSort] = lastMSG;
-            }
-          }
-
-          this.props.latestChats(lastChats);
-
-          var myID = this.state.myDataID,
-            myDetail = {
-              myName: this.state.people[myID].userName,
-              roomID: socket.id,
-              id: myID,
-              uuID: Cookie("GET", ["uuID"])[0]
-            };
-
-          this.getFriendMessage(myDetail);
+          // Get latest MSG
+          this.handleLastChats("GetInitialMSG");
         }
       );
     });
   };
 
-  // ----- // Scrolls
+  // ----- // Scrolls Down Messages from the Message Dashboard
   messageScroll() {
     var chatScrollHght = document.querySelector(".msgDashboard");
     chatScrollHght.scrollTop = chatScrollHght.scrollHeight;
   }
 
-  // ----- // Handles Textarea style when typing
-  textAreaHandler = elm => {
-    // if(elm.value.length > 20 && this.state.textHeight == false){
-    //   this.setState({
-    //     textAreaStyle: {height:"150px"},
-    //     textHeight: true
-    //   })
-    // }
-    // console.log(elm.value.length );
-  };
-
-  // ----- // Sending messange handler
-  handleMessagingActions = (myUserName, checkKey, key2) => {
+  // ----- // Function that handles Sending Messages to the server
+  sendMessageToServer = (myUserName, checkKey, key2) => {
     var recipient = this.props.inboxState,
       recipientName = {
         friend: recipient.people[recipient.activeChatID].userName,
         me: recipient.people[recipient.myDataID].userName
+      },
+      userMSGForm = {
+        message: document.querySelector("#userMessage").value,
+        checkInType: "Register",
+        messageKey: checkKey,
+        name: myUserName,
+        recipient: recipientName.friend,
+        uuID: Cookie("GET", ["uuID"])[0],
+        timeStamp: Date.parse(new Date())
       };
 
-    var userMSGForm = {
-      message: document.querySelector("#userMessage").value,
-      checkInType: "Register",
-      messageKey: checkKey,
-      name: myUserName,
-      recipient: recipientName.friend,
-      uuID: Cookie("GET", ["uuID"])[0],
-      timeStamp: Date.parse(new Date())
-    };
+    // Makes sure MSG box is not empty
+    if (
+      userMSGForm.message.trim() !== "" &&
+      userMSGForm.message.length <= 3000
+    ) {
+      // ----- // Sends Message to the server Here
+      console.log("Sending");
+      socket.emit("SendMessage", userMSGForm, userMSGForm.uuID, recipientName);
 
-    // ----- // Server handler
-    this.sendMessage(userMSGForm, recipientName);
+      delete userMSGForm.uuID;
+      delete userMSGForm.messageKey;
+      delete userMSGForm.checkInType;
 
-    delete userMSGForm.uuID;
-    delete userMSGForm.messageKey;
-    delete userMSGForm.checkInType;
+      var localMSG = this.state.myMSGRoom[key2];
+      localMSG = localMSG ? localMSG : [];
 
-    var localMSG = this.state.myMSGRoom[key2];
-    localMSG = localMSG ? localMSG : [];
-
-    this.setState(
-      {
-        myMSGRoom: {
-          ...this.state.myMSGRoom,
-          [key2]: [...localMSG, userMSGForm]
-        }
-      },
-      () => {
-        document.querySelector("#userMessage").value = "";
-
-        // Gets the lastest chats and push them to props for people section
-        var lastChats = {},
-          myName = this.state.people[this.state.myDataID].userName;
-
-        for (const msgKey of Object.keys(this.state.myMSGRoom)) {
-          let msg = this.state.myMSGRoom[msgKey],
-            lastMSG = msg[msg.length - 1];
-
-          if (
-            lastMSG &&
-            (lastMSG.recipient === myName || lastMSG.name === myName)
-          ) {
-            let nameSort =
-              lastMSG.recipient === myName ? lastMSG.name : lastMSG.recipient;
-            lastChats[nameSort] = lastMSG;
+      this.setState(
+        {
+          myMSGRoom: {
+            ...this.state.myMSGRoom,
+            [key2]: [...localMSG, userMSGForm]
           }
+        },
+        () => {
+          // Get latest MSG
+          this.handleLastChats("GetLocalMSG");
         }
-
-        this.props.latestChats({
-          ...this.props.profileDetails.latestChats,
-          ...lastChats
-        });
-      }
-    );
+      );
+    }
   };
 
-  // ----- // Send chat data to the server
-  sendMessage(msgData, recipientName) {
-    console.log("Sending");
-    socket.emit("SendMessage", msgData, msgData.uuID, recipientName);
-  }
-
-  // ----- // Gets any messages from friends of people wanding to be friend
+  // ----- // Gets any messages from friends of people wanting to be friends
   getFriendMessage = myDetail => {
-    // Emits my info to the server to so it can better identify myself
     socket.emit("UserDetails", myDetail);
 
     socket.on(myDetail.roomID, res => {
       let recipientData = res.messageKey;
+
       if (recipientData) {
         let myID = this.props.inboxState.myDataID,
           myMSGkey = this.props.inboxState.people[myID].messageKey,
@@ -244,39 +164,78 @@ class MessagingBoard extends Component {
             }
           },
           () => {
-            // Gets the lastest chats and push them to props for people section
-            var lastChats = {},
-              myName = this.state.people[this.state.myDataID].userName;
-
-            for (const msgKey of Object.keys(this.state.chatRooms)) {
-              let msg = this.state.chatRooms[msgKey],
-                lastMSG = msg[msg.length - 1];
-
-              if (
-                lastMSG &&
-                (lastMSG.recipient === myName || lastMSG.name === myName)
-              ) {
-                let nameSort =
-                  lastMSG.recipient === myName
-                    ? lastMSG.name
-                    : lastMSG.recipient;
-                lastChats[nameSort] = lastMSG;
-              }
-            }
-            this.props.latestChats({
-              ...this.props.profileDetails.latestChats,
-              ...lastChats
-            });
+            // Get latest MSG
+            this.handleLastChats("GetFriendsMSG");
           }
         );
       }
     });
   };
 
+  // ----- // Handles Getting latest Chat messages and push them to props for people section
+  handleLastChats = ActionType => {
+    var lastChats = {},
+      inboxState = this.props.inboxState,
+      myName = inboxState.people[inboxState.myDataID].userName,
+      roomType = ["GetFriendsMSG", "GetInitialMSG"].includes(ActionType)
+        ? "chatRooms"
+        : "myMSGRoom";
+
+    for (const msgKey of Object.keys(this.state[roomType])) {
+      let msg = this.state[roomType][msgKey],
+        lastMSG = msg[msg.length - 1];
+      if (
+        lastMSG &&
+        (lastMSG.recipient === myName || lastMSG.name === myName)
+      ) {
+        let nameSort =
+          lastMSG.recipient === myName ? lastMSG.name : lastMSG.recipient;
+        lastChats[nameSort] = lastMSG;
+      }
+    }
+
+    switch (ActionType) {
+      case "GetInitialMSG":
+        this.props.latestChats(lastChats);
+
+        // Triggering friends function to send roomID to server so i can keep track who is who
+        var myID = inboxState.myDataID,
+          myDetail = {
+            myName: inboxState.people[myID].userName,
+            roomID: socket.id,
+            id: myID,
+            uuID: Cookie("GET", ["uuID"])[0]
+          };
+
+        this.getFriendMessage(myDetail);
+        break;
+
+      default:
+        // Clear Text Area After setting to state
+        document.querySelector("#userMessage").value = "";
+
+        this.props.latestChats({
+          ...this.props.profileDetails.latestChats,
+          ...lastChats
+        });
+    }
+  };
+
+  // ----- // Handles Video or Audio Call Actions
+  HandlePhoneCall = type => {
+    let phone = this.state.togglePhoneCall ? false : true;
+    let zIndex = this.state.PhoneCallStyle["z-index"] === "-1" ? "3" : "-1";
+
+    this.setState({
+      togglePhoneCall: phone,
+      phoneType: type,
+      PhoneCallStyle: { "z-index": zIndex }
+    });
+  };
+
   render() {
     var inboxState = this.props.inboxState,
       togglePage = this.props.togglePage,
-      msgStyle = inboxState.inboxToMessage,
       textAreaStyle = this.state.textAreaStyle,
       activeChatID = inboxState.activeChatID,
       userName = "",
@@ -318,60 +277,58 @@ class MessagingBoard extends Component {
 
     if (inboxState.toggleType === "MessagingBoard") {
       return (
-        <div className="MessagingBoard">
-          <div className="Header">
-            <i
-              className="fas fa-chevron-left"
-              onClick={() => togglePage("MainPage")}
-            />
-            <div className="MSGheader1">
-              <img src={picture} alt="User" />
-              <div>
-                <span>{userName}</span>
-                <time>----</time>
+        <>
+          <div className="MessagingBoard">
+            <div className="Header">
+              <i
+                className="fas fa-chevron-left"
+                onClick={() => togglePage("Messages")}
+              />
+              <div className="MSGheader1">
+                <div className="msgPic">
+                  <img src={picture} alt="User" />
+                  <span id="status" />
+                </div>
+                <div>
+                  <span>{userName}</span>
+                  <time>Now Active</time>
+                </div>
+              </div>
+
+              <div className="header2">
+                <i
+                  className="fas fa-phone"
+                  onClick={() => this.HandlePhoneCall("phone")}
+                />
+                <i
+                  className="fas fa-video"
+                  onClick={() => this.HandlePhoneCall("video")}
+                />
               </div>
             </div>
 
-            <div className="header2">
-              <i className="fas fa-phone" />
-              <i className="fas fa-video" />
-            </div>
+            {/* A place where messages show */}
+            <ul className="msgDashboard">
+              <Texts
+                ChatData={messageData}
+                myUserName={myUserName}
+                ImgSrc={picture}
+              />
+            </ul>
+
+            {/* TexTING aREA */}
+            <TextArea />
           </div>
 
-          {/* A place where messages show */}
-          <ul className="msgDashboard">
-            <Chats
-              ChatData={messageData}
-              myUserName={myUserName}
-              ImgSrc={picture}
-            />
-          </ul>
-
-          {/* A place where users type */}
-          <form onSubmit={0} className="userTyping">
-            <div className="messageTools">
-              <i className="fas fa-camera" />
-              <i className="fas fa-image" />
-
-              <div className="MSGBox">
-                <textarea
-                  placeholder="New Message"
-                  id="userMessage"
-                  style={textAreaStyle}
-                />
-                <i className="far fa-grin-beam" id="emoji" />
-              </div>
-
-              <i
-                className="fas fa-paper-plane"
-                id="submitMessage"
-                onClick={() =>
-                  this.handleMessagingActions(myUserName, checkKey, key2)
-                }
+          <div className="PhoneCallCont" style={this.state.PhoneCallStyle}>
+            <div className="PhoneCallPhoneCall">
+              <PhoneCall
+                phoneType={this.state.phoneType}
+                HandlePhoneCall={this.HandlePhoneCall}
               />
             </div>
-          </form>
-        </div>
+          </div>
+        </>
       );
     } else {
       return <></>;

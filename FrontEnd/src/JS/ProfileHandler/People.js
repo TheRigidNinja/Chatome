@@ -7,8 +7,7 @@ export default function InboxPeople({
   myDataID,
   latestChats
 }) {
-  var emojis = ["🙋", "😃", "🤗", "👋"],
-    myName = people[myDataID].userName,
+  var myName = people[myDataID].userName,
     chats = "",
     timeStamp = "",
     status,
@@ -16,12 +15,10 @@ export default function InboxPeople({
 
   const People = () => {
     return people.map(data => {
-      chats = `Say hello ${emojis[Math.floor(Math.random() * 4)]} to ${
-        data.userName
-      }`;
+      chats = `Say hello to ${data.userName}`;
       timeStamp = " ";
       status = data.status === "Online" ? "status" : "";
-      paragraphStyle = {"font-weight": "700", "opacity": ".8"};
+      paragraphStyle = { "font-weight": "600","color": "rgba(58, 66, 79,.9)"};
 
       if (data.ID !== myDataID) {
         if (latestChats !== undefined && latestChats[data.userName]) {

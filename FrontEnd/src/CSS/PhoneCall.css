@@ -1,0 +1,136 @@
+.PhoneCallCont {
+  position: absolute;
+  z-index: -1;
+  background: #f5f5fc;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  padding: 10px;
+}
+
+.PhoneCallPhoneCall {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  max-height: 500px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: column nowrap;
+          flex-flow: column nowrap;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.PhoneProfile {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: column nowrap;
+          flex-flow: column nowrap;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin: 50px 0px;
+}
+
+.PhoneProfile img {
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+}
+
+.PhoneProfile label {
+  white-space: nowrap;
+  overflow: hiddena;
+  width: 250px;
+  text-align: center;
+  text-overflow: ellipsis;
+  font-size: 25px;
+  font-weight: 600;
+  margin-top: 15px;
+}
+
+.PhoneProfile small {
+  font-size: 14px;
+  color: rgba(52, 58, 64, 0.6);
+}
+
+.Controls, .endCall {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  position: relative;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.Controls span, .endCall span {
+  position: relative;
+  -webkit-transition: all .2s;
+  transition: all .2s;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  width: 60px;
+  height: 60px;
+  font-size: 25px;
+  border-radius: 50%;
+  border: 2px solid #6b8af4;
+  margin-right: 20px;
+  cursor: pointer;
+  color: #6b8af4;
+}
+
+.Controls span label, .endCall span label {
+  position: absolute;
+  font-size: 12px;
+  top: 60px;
+  color: #6b8af4;
+  margin: 0px;
+  padding: 0px;
+  left: 10px;
+}
+
+.Controls span:hover, .endCall span:hover {
+  background: #6b8af4;
+  color: white;
+}
+
+.endCall span {
+  background: red;
+  border: 2px solid red;
+  border: 2px solid red  !important;
+}
+
+.endCall span i {
+  -webkit-transform: rotate(-135deg);
+          transform: rotate(-135deg);
+  color: white;
+}
+
+.endCall span:hover {
+  background: #c20042 !important;
+  border: 2px solid #c20042  !important;
+}
+
+@media screen and (max-height: 500px) {
+  .endCall {
+    top: -20px;
+  }
+  .PhoneProfile {
+    margin: 25px 0px;
+  }
+}

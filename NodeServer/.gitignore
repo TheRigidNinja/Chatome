@@ -26,4 +26,4 @@ yarn-error.log*
 # Sentative files 
 adminsdk.json
 Config.js
-# AdminSDK.js
+AdminSDK.js

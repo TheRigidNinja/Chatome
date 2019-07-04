@@ -147,10 +147,7 @@ export default class ProfilePic extends Component {
           width: width
         }
       });
-    }
-
-    // Reset the toggled button
-    if (
+    }else if (
       !["SubmitLink", "urlImage", "uploadImage"].includes(
         event.target.className
       )
@@ -158,6 +155,7 @@ export default class ProfilePic extends Component {
       this.defaultPage();
     }
   };
+      // Reset the toggled button
 
   render() {
     switch (this.state.toggleProfile) {
@@ -238,7 +236,7 @@ export default class ProfilePic extends Component {
             <div className="LinkedImage">
               <input
                 type="text"
-                placeholder="https://...."
+                placeholder="https://..... .jpg"
                 className="urlImage"
               />
               <span className="SubmitLink" onClick={this.submitLink}>

@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import "../../CSS/UserProfile.css";
-import "../../CSS/Friends.css";
+import "../../CSS/Stories.css";
 import Fire from "../../FIREBASE/FBConfig";
 import socket from "../Socket";
 import { connect } from "react-redux";
 import MessagingBoard from "../MessageHandler/MessagingBoard";
 import People from "./People";
-import Friends from "./Friends";
+import Stories from "./Stories";
 import YourProfileInfor from "./YourProfileInfor";
 import OnlinePeople from "./OnlinePeople";
 import Cookie from "../Cookie";
@@ -17,9 +17,12 @@ class MainPage extends Component {
   state = {
     myDataID: null,
     people: null,
-    friends: null,
+    stories: null,
     activeChatID: null,
-    toggleType: "Default"
+    toggleType: "Messages",
+    ProfileStyle: { color: "#8486a2" },
+    StoriesStyle: { color: "#8486a2" },
+    MainPageStyle: { color: "white" }
   };
 
   componentWillMount() {
@@ -83,13 +86,12 @@ class MainPage extends Component {
   //----// Handling Page toggle from "MessagingBoard","Friends" and "Inbox"
   togglePage = (PageType, activeChatID) => {
     let event = activeChatID;
-    console.log(PageType);
 
     switch (PageType) {
       // Toggles to MessagingBoard
       case "MessagingBoard":
         this.setState({
-          toggleType: "MessagingBoard",
+          toggleType: PageType,
           activeChatID: activeChatID
         });
         break;
@@ -97,25 +99,38 @@ class MainPage extends Component {
       // Toggles to inbox
       case "MainPage":
         this.setState({
-          toggleType: "MainPage"
+          toggleType: PageType,
+          ProfileStyle: { color: "#8486a2" },
+          StoriesStyle: { color: "#8486a2" },
+          MainPageStyle: { color: "white" }
         });
         break;
 
-      case "Inbox":
-          this.setState({
-            toggleType: "Inbox"
-          });
+      case "Messages":
+        this.setState({
+          toggleType: PageType,
+          ProfileStyle: { color: "#8486a2" },
+          StoriesStyle: { color: "#8486a2" },
+          MainPageStyle: { color: "white" }
+        });
         break;
-      case "Friends":
-          this.setState({
-            toggleType: "Friends"
-          });
+
+      case "Stories":
+        this.setState({
+          toggleType: PageType,
+          ProfileStyle: { color: "#8486a2" },
+          StoriesStyle: { color: "white" },
+          MainPageStyle: { color: "#8486a2" }
+        });
         break;
 
       case "Profile":
-          this.setState({
-            toggleType: "MyProfile"
-          });
+        this.setState({
+          toggleType: PageType,
+          ProfileStyle: { color: "white" },
+          StoriesStyle: { color: "#8486a2" },
+          MainPageStyle: { color: "#8486a2" }
+        });
         break;
     }
   };
@@ -134,7 +149,7 @@ class MainPage extends Component {
         InboxElements = () => {
           return <></>;
         },
-        FriendsDashBoard = () => {
+        ExploreStories = () => {
           return <></>;
         },
         MyProfile = () => {
@@ -143,21 +158,27 @@ class MainPage extends Component {
         Footer = () => {
           return (
             <>
+              <div>
+                <i
+                  className="fas fa-comment"
+                  id="Messages"
+                  style={this.state.MainPageStyle}
+                  onClick={e => this.togglePage("Messages", e)}
+                />
+                {/* <div className="Notifications">12232</div> */}
+              </div>
+
               <i
-                className="fas fa-comment-dots"
-                id="inbox"
-                onClick={e => this.togglePage("Inbox", e)}
+                className="fas fa-compass"
+                id="Stories"
+                style={this.state.StoriesStyle}
+                onClick={e => this.togglePage("Stories", e)}
               />
 
               <i
-                className="fas fa-address-book"
-                id="friends"
-                onClick={e => this.togglePage("Friends", e)}
-              />
-
-              <i
-                className="fas fa-user"
-                id="profile"
+                className="fas fa-user-cog"
+                id="Profile"
+                style={this.state.ProfileStyle}
                 onClick={e => this.togglePage("Profile", e)}
               />
             </>
@@ -171,16 +192,20 @@ class MainPage extends Component {
           };
           break;
 
-        case "Friends":
-            FriendsDashBoard = () => {
-            return <Friends />;
+        case "Stories":
+          ExploreStories = () => {
+            return (
+              <div className="Stories" style={this.state.stories}>
+                <Stories />
+              </div>
+            );
           };
           break;
 
-        case "MyProfile":
+        case "Profile":
           MyProfile = () => {
             return (
-              <>
+              <div className="YourProfileInfor">
                 <div className="myDetails">
                   <img src={picture} id="userPicture" alt="IMG" />
                   <span className="editImg">
@@ -190,7 +215,7 @@ class MainPage extends Component {
                 </div>
 
                 <div className="MoreDetail">{/* <YourProfileInfor /> */}</div>
-              </>
+              </div>
             );
           };
           break;
@@ -199,11 +224,6 @@ class MainPage extends Component {
           InboxElements = () => {
             return (
               <>
-                <OnlinePeople
-                  togglePage={this.togglePage}
-                  people={this.state.people}
-                  myDataID={this.state.myDataID}
-                />
                 <People
                   togglePage={this.togglePage}
                   people={this.state.people}
@@ -220,35 +240,36 @@ class MainPage extends Component {
           <div className="Profile">
             <div className="scollArea">
               <div className="Header">
-                <div className="header1">
-                  <img src={picture} alt="User" id="userPicture" />
-                  <span id="LogoDescription">{"Chats"}</span>
+                <div className="headerCont">
+                  <div className="header1">
+                    <span id="LogoDescription">{this.state.toggleType}</span>
+                  </div>
+                  <div className="header2">
+                    <i className="fas fa-camera-retro" />
+                    <i className="fas fa-feather-alt" />
+                  </div>
                 </div>
-                <div className="header2">
-                  <a href="##camera">
-                    <i className="fas fa-camera" />
-                  </a>
-                  <a href="##post">
-                    <i className="fas fa-edit" />
-                  </a>
+
+                <div className="OnlineCont">
+                  <OnlinePeople
+                    togglePage={this.togglePage}
+                    people={this.state.people}
+                    myDataID={this.state.myDataID}
+                  />
+                  <input type="search" placeholder="Search by name" />
                 </div>
               </div>
 
               {/* Display People that have ever created an account */}
               <div className="inboxSection">
-                <input type="search" placeholder="search by name" onChange={0} />
                 <InboxElements />
               </div>
 
-              {/* Displays Friends or people you have communicated to */}
-              <div className="Friends" style={this.state.friendsDashBoard} />
-
-              <FriendsDashBoard />
+              {/* Displays Stories for everyone*/}
+              <ExploreStories />
 
               {/* Shows your profile */}
-              <div className="YourProfileInfor">
-                <MyProfile />
-              </div>
+              <MyProfile />
             </div>
           </div>
 

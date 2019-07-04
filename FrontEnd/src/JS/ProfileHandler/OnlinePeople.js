@@ -3,13 +3,12 @@ import addStory from "../../IMG/story.svg";
 import LZString from "lz-string";
 
 export default function OnlinePeople({ people, togglePage, myDataID }) {
-
   const People = () => {
     try {
       return people.map(data => {
         if (data.ID !== myDataID && data.status === "Online") {
           return (
-            <>
+            <div className="onlinePeople">
               <div
                 key={Math.random()}
                 className="Onlineperson"
@@ -17,9 +16,9 @@ export default function OnlinePeople({ people, togglePage, myDataID }) {
               >
                 <img src={data.picture} />
                 <span id="status" />
-                <h6>{data.userName}</h6>
+                {/* <h6>{data.userName}</h6> */}
               </div>
-            </>
+            </div>
           );
         } else {
           return <></>;
@@ -30,13 +29,5 @@ export default function OnlinePeople({ people, togglePage, myDataID }) {
     }
   };
 
-  return (
-    <div className="onlinePeople">
-      <div className="Onlineperson" onClick={0}>
-        <img src={addStory} alt="IMG" />
-        <h6>Your story</h6>
-      </div>
-      <People />
-    </div>
-  );
+  return <People />;
 }

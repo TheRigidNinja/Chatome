@@ -1,6 +1,6 @@
-import firebase from "firebase";
+import firebase from "../../node_modules/firebase";
 
- // Your web app's Firebase configuration
+ // Firebase Config KEY
   var firebaseConfig = {
     apiKey: "AIzaSyBa292saQfeQuy-uSq0kur6Zu2UeUdmfuQ",
     authDomain: "chatapp-66db3.firebaseapp.com",
