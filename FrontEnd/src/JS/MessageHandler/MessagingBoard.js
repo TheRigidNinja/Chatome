@@ -79,7 +79,7 @@ class MessagingBoard extends Component {
         me: recipient.people[recipient.myDataID].userName
       },
       userMSGForm = {
-        message: document.querySelector("#userMessage").value,
+        message: document.querySelector(".MSGBox").innerHTML,
         checkInType: "Register",
         messageKey: checkKey,
         name: myUserName,
@@ -212,7 +212,9 @@ class MessagingBoard extends Component {
 
       default:
         // Clear Text Area After setting to state
-        document.querySelector("#userMessage").value = "";
+        if (document.querySelector(".MSGBox").innerHTML) {
+          document.querySelector(".MSGBox").innerHTML = "";
+        }
 
         this.props.latestChats({
           ...this.props.profileDetails.latestChats,
@@ -317,15 +319,20 @@ class MessagingBoard extends Component {
             </ul>
 
             {/* TexTING aREA */}
-            <TextArea />
+            <TextArea
+              myUserName={myUserName}
+              checkKey={checkKey}
+              key2={key2}
+              sendMessageToServer={this.sendMessageToServer}
+            />
           </div>
 
           <div className="PhoneCallPhoneCall" style={this.state.PhoneCallStyle}>
-              <PhoneCall
-                recipientData={{"name":userName,"pic":picture}}
-                phoneType={this.state.phoneType}
-                HandlePhoneCall={this.HandlePhoneCall}
-              />
+            <PhoneCall
+              recipientData={{ name: userName, pic: picture }}
+              phoneType={this.state.phoneType}
+              HandlePhoneCall={this.HandlePhoneCall}
+            />
           </div>
         </>
       );

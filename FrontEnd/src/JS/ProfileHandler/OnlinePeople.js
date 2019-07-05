@@ -8,7 +8,7 @@ export default function OnlinePeople({ people, togglePage, myDataID }) {
       return people.map(data => {
         if (data.ID !== myDataID && data.status === "Online") {
           return (
-            <div className="onlinePeople">
+            // <div className="onlinePeople">
               <div
                 key={Math.random()}
                 className="Onlineperson"
@@ -18,7 +18,7 @@ export default function OnlinePeople({ people, togglePage, myDataID }) {
                 <span id="status" />
                 {/* <h6>{data.userName}</h6> */}
               </div>
-            </div>
+            // </div>
           );
         } else {
           return <></>;
@@ -29,5 +29,5 @@ export default function OnlinePeople({ people, togglePage, myDataID }) {
     }
   };
 
-  return <People />;
+  return <div className="onlinePeople"><People /></div>;
 }

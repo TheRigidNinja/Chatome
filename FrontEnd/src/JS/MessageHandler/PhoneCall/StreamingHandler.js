@@ -5,13 +5,15 @@ var video,
   cv = window.openCV;
 
 export default function StreamingHandler(data) {
-  if (data === "GetElm") {
+
+  if (data === "GetElm" && !(!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices)) {
     setTimeout(() => {
       video = document.querySelector(".myVideo");
       recipientVideo = document.querySelector(".recipientVideo");
 
       myVideoStream();
     }, 100);
+  } else {
   }
 }
 
@@ -19,14 +21,14 @@ function myVideoStream() {
   let height = video.offsetHeight,
     width = video.offsetWidth,
     streaming = false,
-    FPS = 30, 
+    FPS = 30,
     src,
     dst;
   // const cap = new cv.VideoCapture(video);
 
   // Getting a video from webcam to stream online
   navigator.mediaDevices
-    .getUserMedia({ video:{width: 200,height: 300}, audio: true })
+    .getUserMedia({ video: { width: 200, height: 300 }, audio: true })
     .then(stream => {
       video.srcObject = stream;
       video.play();

@@ -62,7 +62,7 @@ io.on("connection", socket => {
     // Sends message to the database
     var sendMSG = await messaging.sendMessage(res, key, recipient);
 
-    // Only works if you are a new friends to the persorn who send the MSG
+    // Only works if you are a new friends to the person who send the MSG
     if (newFriend === true) {
       res.messageKey = sendMSG;
       io.sockets.in(roomID).emit(roomID, res);

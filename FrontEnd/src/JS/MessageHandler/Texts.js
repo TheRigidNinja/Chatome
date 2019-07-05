@@ -1,4 +1,5 @@
 import React from "react";
+import ReactHtmlParser, { processNodes, convertNodeToElement, htmlparser2 } from 'react-html-parser';
 
 export default function Chats({ ChatData, myUserName, ImgSrc }) {
 
@@ -17,7 +18,7 @@ export default function Chats({ ChatData, myUserName, ImgSrc }) {
               <div>
                 <img src={ImgSrc} id="userIcon" alt="IMG" />
                 <label>{msg.name}</label>
-                <div>{msg.message}</div>
+                <div>{ReactHtmlParser (msg.message)}</div>
               </div>
             </li>
           );
@@ -29,7 +30,7 @@ export default function Chats({ ChatData, myUserName, ImgSrc }) {
               <time>{msg.timeStamp}</time>
               <div>
                 <label>{msg.name}</label>
-                <div>{msg.message}</div>
+                <div>{ReactHtmlParser (msg.message)}</div>
               </div>
             </li>
           );

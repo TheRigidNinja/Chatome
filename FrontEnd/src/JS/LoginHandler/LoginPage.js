@@ -68,6 +68,7 @@ class LoginPage extends Component {
 
     if (userName.offsetHeight === 0) {
       userLabel.setAttribute("required","required");
+      alert("I see you want to Register,\n\n You can use a 'FAKE' Email or 'Username'. \n\nI will not collect any information that you provide beyond the use on this application. \n\n Cheers!")
 
       // formgroup
       this.setState({
@@ -81,7 +82,6 @@ class LoginPage extends Component {
       });
     } else {
       userLabel.removeAttribute("required");
-
       this.setState({
         avatar: {
           opacity: 0,
@@ -196,6 +196,7 @@ class LoginPage extends Component {
     return (
       <section className="LoginSection">
         <span id="Alert" style={this.state.alert} />
+
         <div className="content container">
           <h3>Welcome to Chatome</h3>
 

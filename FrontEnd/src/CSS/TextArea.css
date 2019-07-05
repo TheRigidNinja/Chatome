@@ -1,9 +1,8 @@
 .userTyping {
   position: absolute;
-  top: calc(100% - 45px);
-  background: white;
+  background: rgba(52, 58, 64, 0.95);
   width: 100%;
-  padding: 0px 13px;
+  padding: 2px 13px;
   margin: 0px;
 }
 
@@ -25,6 +24,7 @@
 
 .messageTools i {
   cursor: pointer;
+  color: white;
 }
 
 .InsertImage {
@@ -33,13 +33,14 @@
 
 .InsertImage i {
   margin-right: 13px;
-  margin-top: -10px;
 }
 
 .submitMessage {
   margin-left: 13px;
-  margin-top: -10px;
-  color: #3f6aff;
+}
+
+.submitMessage i {
+  color: #6b8af4;
 }
 
 .TextArea {
@@ -49,13 +50,13 @@
   padding: 0px;
   min-height: 40px;
   margin: 0px;
-  margin-bottom: 10px;
+  margin-bottom: 3px;
 }
 
 .MSGBox {
-  background: #f5f5f5;
+  background: #f5f5fc;
   width: 100%;
-  padding: 5px 32px 5px 10px;
+  padding: 5px 10px;
   font-size: 15px;
   outline: none;
   border-radius: 20px;
@@ -65,8 +66,26 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.MSGBox img {
+  border-radius: 5px;
+  margin-right: 100%;
+  margin: 5px 0px;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
 #emoji {
   position: absolute;
   top: calc(50% - 11px);
   left: calc(100% - 28px);
+  color: #343a40;
+}
+
+#placeHolder {
+  position: absolute;
+  font-size: 16px;
+  z-index: 1;
+  top: 10px;
+  left: 10px;
 }
