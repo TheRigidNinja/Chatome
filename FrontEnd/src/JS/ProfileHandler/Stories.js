@@ -4,7 +4,7 @@ export default function Stories(data) {
   console.log("Active Stories");
 
   const DailySnapShoots = data => {
-    return ["",""].map(info => {
+    return [].map(info => {
       return (
         <div className="DailySnap">
           <img src="##" alt="name" />

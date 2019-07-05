@@ -7,7 +7,17 @@
     left: 0px
     top: 0px
 
-    
+ #Alert
+    transition: all .2s
+    @extend %resetELm
+    height: auto
+    background: #202651
+    color: white
+    padding: 0px
+    border-radius: 0px 0px 60px 60px
+    text-align: center
+    z-index: 10
+   
 .LoginSection 
     position: relative
     background: #5b5b96 !important
@@ -25,19 +35,7 @@
   
 .LoginSection:before
     top: calc(100% - 150px)
-    // transform: rotate(60deg)
     left: 20px 
-
-#Alert
-    transition: all cubic-bezier(.82,.01,.42,.84) .2s
-    @extend %resetELm
-    height: auto
-    background: #202651
-    color: white
-    padding: 0px
-    border-radius: 0px 0px 100px 100px
-    text-align: center
-    z-index: 3
 
 .LoginForm
     position: relative

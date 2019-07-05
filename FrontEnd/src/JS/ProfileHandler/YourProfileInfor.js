@@ -1,39 +1,63 @@
-import React from 'react'
+import React from "react";
 
 function ProfileManager() {
-    return (
-        <>
-            {/* User Email */}
-            <div className="Person" usermsgkey={0} onClick={0}>
-                <img src="../public/Img/User.svg" alt="IMG"/>
-                <div className="details">
-                    <h4>NAN</h4>
-                    <p>---</p>
-                </div>
-                <time>8:40pm</time>
-            </div>
+  return (
+    <>
+      {/* User Email */}
+      <div className="Person">
+        <div className="details">
+          <h4>Email</h4>
+          <p>------------</p>
+        </div>
+        <i class="fas fa-pen"/>
+      </div>
 
-            {/* User Phone number */}
-            <div className="Person" usermsgkey={0} onClick={0}>
-                <img src="../public/Img/User.svg" alt="IMG"/>
-                <div className="details">
-                    <h4>NAN</h4>
-                    <p>---</p>
-                </div>
-                <time>8:40pm</time>
-            </div>
+      {/* User Phone number */}
+      <div className="Person">
+        <div className="details">
+          <h4>Phone</h4>
+          <p>------------</p>
+        </div>
+        <i class="fas fa-pen"/>
+      </div>
 
-            {/* UserNickName */}
-            <div className="Person" usermsgkey={0} onClick={0}>
-                <img src="../public/Img/User.svg" alt="IMG"/>
-                <div className="details">
-                    <h4>NAN</h4>
-                    <p>---</p>
-                </div>
-                <time>8:40pm</time>
-            </div>
-        </>
-    )
+      {/* Your Gender */}
+      <div className="Person">
+        <div className="details">
+          <h4>Gender</h4>
+          <p>-------</p>
+        </div>
+        <i class="fas fa-pen"/>
+      </div>
+
+      {/* Age */}
+      <div className="Person">
+        <div className="details">
+          <h4>Your Age</h4>
+          <p>--</p>
+        </div>
+        <i class="fas fa-pen"/>
+      </div>
+
+      {/* Allow Calls */}
+      <div className="Person">
+        <div className="details">
+          <h4>Allow Calls</h4>
+          <p>Yes</p>
+        </div>
+        <i class="fas fa-pen"/>
+      </div>
+
+      {/* Make Profile Public */}
+      <div className="Person">
+        <div className="details">
+          <h4>Make Profile Public</h4>
+          <p>Yes</p>
+        </div>
+        <i class="fas fa-pen"/>
+      </div>
+    </>
+  );
 }
 
-export default ProfileManager
+export default ProfileManager;

@@ -137,6 +137,7 @@ class MainPage extends Component {
 
   render() {
     if (!this.state.people) {
+      // Renders this screen if loading
       return (
         <div id="Loader">
           <img src={loaderGIF} />
@@ -144,8 +145,10 @@ class MainPage extends Component {
         </div>
       );
     } else {
+      // Renders the following depending on page toggle
       var myID = this.state.myDataID,
         picture = this.state.people[myID].picture,
+        userName = this.state.people[myID].userName,
         InboxElements = () => {
           return <></>;
         },
@@ -211,10 +214,12 @@ class MainPage extends Component {
                   <span className="editImg">
                     <i className="fas fa-user-edit" />
                   </span>
-                  <span className="userName">---</span>
+                  <span className="userName">{userName}</span>
                 </div>
 
-                <div className="MoreDetail">{/* <YourProfileInfor /> */}</div>
+                <div className="MoreDetail">
+                  <YourProfileInfor />
+                </div>
               </div>
             );
           };
@@ -235,6 +240,41 @@ class MainPage extends Component {
           };
       }
 
+      // Renders The following search bar and online people depending on page type
+      const HeaderStatus = () => {
+        var PeopleOnline = () => {
+            return <></>;
+          },
+          SearchBar = () => {
+            return <></>;
+          };
+
+        if (this.state.toggleType === "Messages") {
+          PeopleOnline = () => {
+            return (
+              <OnlinePeople
+                togglePage={this.togglePage}
+                people={this.state.people}
+                myDataID={this.state.myDataID}
+              />
+            );
+          };
+        }
+
+        if (["Messages", "Stories"].includes(this.state.toggleType)) {
+          SearchBar = () => {
+            return <input type="search" placeholder="Search by name" />;
+          };
+        }
+
+        return (
+          <>
+            <PeopleOnline />
+            <SearchBar />
+          </>
+        );
+      };
+
       return (
         <section className="UserInterface">
           <div className="Profile">
@@ -251,12 +291,7 @@ class MainPage extends Component {
                 </div>
 
                 <div className="OnlineCont">
-                  <OnlinePeople
-                    togglePage={this.togglePage}
-                    people={this.state.people}
-                    myDataID={this.state.myDataID}
-                  />
-                  <input type="search" placeholder="Search by name" />
+                  <HeaderStatus />
                 </div>
               </div>
 

@@ -320,13 +320,12 @@ class MessagingBoard extends Component {
             <TextArea />
           </div>
 
-          <div className="PhoneCallCont" style={this.state.PhoneCallStyle}>
-            <div className="PhoneCallPhoneCall">
+          <div className="PhoneCallPhoneCall" style={this.state.PhoneCallStyle}>
               <PhoneCall
+                recipientData={{"name":userName,"pic":picture}}
                 phoneType={this.state.phoneType}
                 HandlePhoneCall={this.HandlePhoneCall}
               />
-            </div>
           </div>
         </>
       );
