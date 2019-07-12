@@ -29,7 +29,6 @@ class MessagingBoard extends Component {
   }
 
   componentDidUpdate() {
-    console.log("object");
     if (this.props.inboxState.toggleType === "MessagingBoard") {
       // Scrolls message Board
       this.messageScroll();
@@ -88,11 +87,15 @@ class MessagingBoard extends Component {
         timeStamp: Date.parse(new Date())
       };
 
+
+      console.log(userMSGForm.message)
     // Makes sure MSG box is not empty
     if (
       userMSGForm.message.trim() !== "" &&
       userMSGForm.message.length <= 3000
     ) {
+
+
       // ----- // Sends Message to the server Here
       console.log("Sending");
       socket.emit("SendMessage", userMSGForm, userMSGForm.uuID, recipientName);
@@ -212,7 +215,7 @@ class MessagingBoard extends Component {
 
       default:
         // Clear Text Area After setting to state
-        if (document.querySelector(".MSGBox").innerHTML) {
+        if (document.querySelector(".MSGBox")) {
           document.querySelector(".MSGBox").innerHTML = "";
         }
 
@@ -238,7 +241,6 @@ class MessagingBoard extends Component {
   render() {
     var inboxState = this.props.inboxState,
       togglePage = this.props.togglePage,
-      textAreaStyle = this.state.textAreaStyle,
       activeChatID = inboxState.activeChatID,
       userName = "",
       picture = "",
@@ -253,9 +255,10 @@ class MessagingBoard extends Component {
       var friendsMSGkey = inboxState.people[activeChatID].messageKey,
         myMSGkey = inboxState.people[myID].messageKey,
         key1 = friendsMSGkey + myMSGkey,
-        key2 = myMSGkey + friendsMSGkey,
-        checkKey = this.state.chatRooms[key1] ? key1 : key2,
-        myUserName = inboxState.people[myID].userName;
+        key2 = myMSGkey + friendsMSGkey;
+        
+      checkKey = this.state.chatRooms[key1] ? key1 : key2;
+      myUserName = inboxState.people[myID].userName;
 
       messageData = this.state.chatRooms[checkKey];
 

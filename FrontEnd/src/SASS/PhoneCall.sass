@@ -82,9 +82,9 @@ $themeFontColor:  rgb(107, 138, 244)
         color: white
 
 .endCall span
-    background: red 
-    border: 2px solid red
-    border: 2px solid red  !important
+    background: rgb(240, 62, 62) 
+    border: 2px solid rgb(240, 62, 62)
+    border: 2px solid rgb(240, 62, 62)  !important
 
     i 
         transform: rotate(-135deg)
@@ -96,17 +96,27 @@ $themeFontColor:  rgb(107, 138, 244)
 
 
 // Streaming Elements 
-video,.recipientVideo
+#recipientVideo,#myCanvasVideo
     position: absolute 
     width: 100%
     height: 100%
     left: 0px
     top: 0px
 
+// #myCanvasVideo
+
 video
-    // display: none
+    position: absolute
+    border-radius: 8px
+    width: 100px
+    height: 100px
+    left: calc(100% - 102px)
+    top: 2px
+    background: rgba(0, 0, 0, 0.7)
 
 
+video,#myCanvasVideo
+    display: none
 
 
 

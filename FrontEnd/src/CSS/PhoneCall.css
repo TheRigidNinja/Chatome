@@ -110,9 +110,9 @@
 }
 
 .endCall span {
-  background: red;
-  border: 2px solid red;
-  border: 2px solid red  !important;
+  background: #f03e3e;
+  border: 2px solid #f03e3e;
+  border: 2px solid #f03e3e !important;
 }
 
 .endCall span i {
@@ -126,12 +126,26 @@
   border: 2px solid #c20042  !important;
 }
 
-video, .recipientVideo {
+#recipientVideo, #myCanvasVideo {
   position: absolute;
   width: 100%;
   height: 100%;
   left: 0px;
   top: 0px;
+}
+
+video {
+  position: absolute;
+  border-radius: 8px;
+  width: 100px;
+  height: 100px;
+  left: calc(100% - 102px);
+  top: 2px;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+video, #myCanvasVideo {
+  display: none;
 }
 
 @media screen and (max-height: 500px) {

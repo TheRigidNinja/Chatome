@@ -10,7 +10,7 @@ class LoginPage extends Component {
   state = {
     avatar: {
       opacity: 0,
-      "margin-top": -230
+      "marginTop": -230
     },
     userNameStyle: {
       display: "none"
@@ -74,7 +74,7 @@ class LoginPage extends Component {
       this.setState({
         avatar: {
           opacity: 1,
-          "margin-top": 0
+          "marginTop": 0
         },
         userNameStyle: {
           display: "block"
@@ -85,7 +85,7 @@ class LoginPage extends Component {
       this.setState({
         avatar: {
           opacity: 0,
-          "margin-top": -230
+          "marginTop": -230
         },
         userNameStyle: {
           display: "none"

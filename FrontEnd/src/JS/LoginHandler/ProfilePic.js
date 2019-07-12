@@ -89,9 +89,8 @@ export default class ProfilePic extends Component {
 
   // ----- // Checks if link is valid as IMG other wise return an err OR Procced
   submitLink = () => {
-    let link = document.querySelector(".urlImage").value,
-      re = new RegExp(".jpeg|.jpg|.png|.gif");
-
+    let link = document.querySelector(".urlImage").value;
+    
     // Check if URL is an image
     if (!/(\.jpeg|\.jpg|\.png|\.gif)/g.test(link)) {
       this.props.WarningHandler(

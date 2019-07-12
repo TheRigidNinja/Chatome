@@ -1,9 +1,9 @@
 import React from "react";
-import ReactHtmlParser, { processNodes, convertNodeToElement, htmlparser2 } from 'react-html-parser';
+import ReactHtmlParser from 'react-html-parser';
 
 export default function Chats({ ChatData, myUserName, ImgSrc }) {
 
-  console.log("Active Chats");
+  // console.log("Active Chats");
 
   const UserMessages = () => {
     if (ChatData) {

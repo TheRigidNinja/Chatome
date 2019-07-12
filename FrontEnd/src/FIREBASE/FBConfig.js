@@ -1,4 +1,6 @@
-import firebase from "../../node_modules/firebase";
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/firestore';
 
  // Firebase Config KEY
   var firebaseConfig = {

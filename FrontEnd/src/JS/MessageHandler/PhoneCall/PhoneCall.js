@@ -1,27 +1,28 @@
 import React from "react";
 import "../../../CSS/PhoneCall.css";
-import Streaming from "./StreamingHandler";
+// import Streaming from "./StreamingHandler";
 
 export default function PhoneCall({
   phoneType,
   HandlePhoneCall,
   recipientData
 }) {
-  // console.log(window.openCV);
+  console.log(recipientData);
 
   if (phoneType) {
-    Streaming("GetElm");
+    // Streaming(phoneType);
 
     return (
       <>
         {/* Video element for streaming */}
         <video className="myVideo" />
-        <canvas className="recipientVideo" />
+        <canvas id="recipientVideo" />
+        <canvas id="myCanvasVideo" />
 
         <div className="ControlCont">
           <div>
             <div className="PhoneProfile">
-              <img src={recipientData.pic} />
+              <img src={recipientData.pic} alt="Friend Img"/>
               <label>{recipientData.name}</label>
               <small>Ringing...</small>
             </div>

@@ -24,3 +24,4 @@ yarn-error.log*
 # Personal Files 
 /FirebaseBuild
 /FIREBASE
+/FBConfig.js

@@ -23,13 +23,16 @@ export class TextingHandler extends Component {
   }
 
   TextAreaEventAction(action) {
-    switch (action) {
-      case "Input":
+    switch (true) {
+      case action === "Input":
         let hght = this.state.textArea.offsetHeight + 13,
           placeHolderText = "";
         if (["", "<br>"].includes(this.state.textArea.innerHTML)) {
           placeHolderText = "Aa";
-          this.state.textArea.innerHTML = "";
+
+          // this.setState({
+          //   textArea: this.textArea.innerHTML = ""
+          // }) 
         }
 
         this.setState({
@@ -40,7 +43,35 @@ export class TextingHandler extends Component {
         });
         break;
 
-      case "drag":
+      case action === "paste" || action === "drop":
+        // console.log(document.querySelector(".MSGBox").innerHTML);
+        // let elment = document.querySelector(".MSGBox");
+        // setTimeout(() => {
+
+        //   let img = elment.innerHTML.match(
+        //       /((\w+:\/\/\S+)|(\w+[\.:]\w+\S+))[^\s,\.]/gi
+        //     ),
+        //     imgAdress = elment.innerText;
+
+        //   if (img) {
+        //     imgAdress = JSON.stringify(
+        //       img.map(urls => {
+        //         return "<img src=" + urls + ">";
+        //       })
+        //     ).replace(/\[|\]|"/g, "");
+
+        //     imgAdress =
+        //       action === "drop"
+        //         ? imgAdress.substr(0, imgAdress.length - 2) + ">"
+        //         : imgAdress;
+        //   }
+        //   // elment.innerText
+
+        //   console.log(imgAdress,);
+        //   // elment.innerHTML = imgAdress;
+        // }, 0);
+
+        // console.log(elment.inner);
         break;
 
       default:
@@ -67,6 +98,8 @@ export class TextingHandler extends Component {
               className="MSGBox"
               contentEditable="true"
               onInput={() => this.TextAreaEventAction("Input")}
+              onPasteCapture={() => this.TextAreaEventAction("paste")}
+              onDrop={() => this.TextAreaEventAction("drop")}
             />
 
             {/* <i className="fas fa-laugh" id="emoji" /> */}
