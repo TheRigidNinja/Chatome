@@ -1,18 +1,24 @@
-.PhoneCallPhoneCall {
+.PhoneCall {
+  -webkit-transition: all .2s ease-in-out;
+  transition: all .2s ease-in-out;
   position: absolute;
-  z-index: -1;
+  z-index: 10;
   background: #f5f5fc;
   width: 100%;
   height: 100%;
   top: 0px;
-  padding: 10px;
+  margin: 0px;
+  padding: 0px;
+  display: none;
+  opacity: 0;
 }
 
 .ControlCont {
   position: absolute;
   width: 100%;
   height: 100%;
-  max-height: 500px;
+  margin: 0px;
+  padding: 0px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -20,9 +26,13 @@
   -webkit-box-direction: normal;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.ButtonsCont {
+  height: 150px;
 }
 
 .PhoneProfile {
@@ -36,13 +46,15 @@
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-  margin: 50px 0px;
+  margin: 0px;
+  margin-bottom: 60px;
 }
 
 .PhoneProfile img {
-  border-radius: 50%;
-  width: 100px;
-  height: 100px;
+  width: 130px;
+  height: 130px;
+  background-size: cover;
+  background-position: center;
 }
 
 .PhoneProfile label {
@@ -62,6 +74,8 @@
 }
 
 .Controls, .endCall {
+  -webkit-transition: all .2s;
+  transition: all .2s;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -89,24 +103,33 @@
   font-size: 25px;
   border-radius: 50%;
   border: 2px solid #6b8af4;
-  margin-right: 20px;
   cursor: pointer;
   color: #6b8af4;
 }
 
 .Controls span label, .endCall span label {
+  width: 100%;
   position: absolute;
   font-size: 12px;
   top: 60px;
   color: #6b8af4;
   margin: 0px;
   padding: 0px;
-  left: 10px;
+  text-align: center;
+  left: 0px;
 }
 
 .Controls span:hover, .endCall span:hover {
-  background: #6b8af4;
+  background: rgba(107, 138, 244, 0.8);
   color: white;
+}
+
+.Controls span {
+  margin: 0px 15px;
+}
+
+.endCall {
+  padding-top: 50px;
 }
 
 .endCall span {
@@ -126,7 +149,7 @@
   border: 2px solid #c20042  !important;
 }
 
-#recipientVideo, #myCanvasVideo {
+#recipientVideo, video {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -134,18 +157,76 @@
   top: 0px;
 }
 
-video {
+#myCanvasVideo {
   position: absolute;
   border-radius: 8px;
-  width: 100px;
+  width: 80px;
   height: 100px;
-  left: calc(100% - 102px);
-  top: 2px;
+  left: calc(100% - 82px);
+  top: 3px;
   background: rgba(0, 0, 0, 0.7);
 }
 
-video, #myCanvasVideo {
+#myCanvasVideo {
   display: none;
+}
+
+.PhoneCall video {
+  opacity: 0;
+}
+
+.activeCallShow {
+  display: block !important;
+}
+
+.activeCallHide {
+  display: none !important;
+}
+
+.activeCallJustify {
+  -ms-flex-pack: distribute !important;
+      justify-content: space-around !important;
+}
+
+.activeCallFlexEnd {
+  -webkit-box-pack: end !important;
+      -ms-flex-pack: end !important;
+          justify-content: flex-end !important;
+}
+
+.activeCallFlexEnd span {
+  font-size: 20px;
+  width: 45px;
+  height: 45px;
+}
+
+.activeCallFlexEnd span label {
+  top: 45px;
+}
+
+.activeCallHeight {
+  height: 80px !important;
+}
+
+.activeCallMargin {
+  padding: 0px !important;
+  left: 0px;
+  top: -110px !important;
+  position: relative;
+}
+
+.activeCallMargin span {
+  font-size: 20px;
+  width: 45px;
+  height: 45px;
+}
+
+.ActiveCall {
+  background: #6b8af4;
+}
+
+.ActiveCall i {
+  color: white;
 }
 
 @media screen and (max-height: 500px) {

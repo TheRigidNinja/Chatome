@@ -41,6 +41,7 @@ export default class ProfilePic extends Component {
   // ----- // Functions handles taking a photo
   capture = () => {
     const imageSrc = this.webcam.getScreenshot();
+
     this.handleProfilePicToState(imageSrc);
   };
 
@@ -90,10 +91,10 @@ export default class ProfilePic extends Component {
   // ----- // Checks if link is valid as IMG other wise return an err OR Procced
   submitLink = () => {
     let link = document.querySelector(".urlImage").value;
-    
+
     // Check if URL is an image
     if (!/(\.jpeg|\.jpg|\.png|\.gif)/g.test(link)) {
-      this.props.WarningHandler(
+      this.props.systemWarning(
         "URL is not not an Image. Please provide a valid Image URL"
       );
       document.querySelector(".urlImage").value = "";
@@ -109,7 +110,7 @@ export default class ProfilePic extends Component {
       this.handleProfilePicToState(imgUrl);
     } else {
       // Give warning
-      this.props.WarningHandler(
+      this.props.systemWarning(
         "Image Size Too Big!! Please Choose images that are < than 512 KB"
       );
     }
@@ -146,7 +147,7 @@ export default class ProfilePic extends Component {
           width: width
         }
       });
-    }else if (
+    } else if (
       !["SubmitLink", "urlImage", "uploadImage"].includes(
         event.target.className
       )
@@ -154,7 +155,7 @@ export default class ProfilePic extends Component {
       this.defaultPage();
     }
   };
-      // Reset the toggled button
+  // Reset the toggled button
 
   render() {
     switch (this.state.toggleProfile) {

@@ -1,6 +1,6 @@
 import React from "react";
 
-function ProfileManager() {
+function Profile() {
   return (
     <>
       {/* User Email */}
@@ -9,7 +9,7 @@ function ProfileManager() {
           <h4>Email</h4>
           <p>------------</p>
         </div>
-        <i class="fas fa-pen"/>
+        <i className="fas fa-pen"/>
       </div>
 
       {/* User Phone number */}
@@ -18,7 +18,7 @@ function ProfileManager() {
           <h4>Phone</h4>
           <p>------------</p>
         </div>
-        <i class="fas fa-pen"/>
+        <i className="fas fa-pen"/>
       </div>
 
       {/* Your Gender */}
@@ -27,7 +27,7 @@ function ProfileManager() {
           <h4>Gender</h4>
           <p>-------</p>
         </div>
-        <i class="fas fa-pen"/>
+        <i className="fas fa-pen"/>
       </div>
 
       {/* Age */}
@@ -36,7 +36,7 @@ function ProfileManager() {
           <h4>Your Age</h4>
           <p>--</p>
         </div>
-        <i class="fas fa-pen"/>
+        <i  className="fas fa-pen"/>
       </div>
 
       {/* Allow Calls */}
@@ -45,7 +45,7 @@ function ProfileManager() {
           <h4>Allow Calls</h4>
           <p>Yes</p>
         </div>
-        <i class="fas fa-pen"/>
+        <i className="fas fa-pen"/>
       </div>
 
       {/* Make Profile Public */}
@@ -54,10 +54,10 @@ function ProfileManager() {
           <h4>Make Profile Public</h4>
           <p>Yes</p>
         </div>
-        <i class="fas fa-pen"/>
+        <i className="fas fa-pen"/>
       </div>
     </>
   );
 }
 
-export default ProfileManager;
+export default Profile;

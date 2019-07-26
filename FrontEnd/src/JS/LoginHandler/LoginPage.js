@@ -1,29 +1,21 @@
 import React, { Component } from "react";
 import "../../CSS/Authentifacation.css";
-import Fire from "../../FIREBASE/FBConfig";
-import { connect } from "react-redux";
-import ProfilePic from "./ProfilePic";
+import Fire from "./FB-ConfigKey";
+import ProfilePic from "./PicHandler";
 import socket from "../Socket";
+import SystemAlert from "../SystemAlert";
+import Cookie from "../Cookies";
 
-var pageToggle = 0;
 class LoginPage extends Component {
   state = {
     avatar: {
       opacity: 0,
-      "marginTop": -230
+      marginTop: -230
     },
     userNameStyle: {
       display: "none"
-    },
-    alert: { padding: 0 }
-  };
-
-  componentDidMount() {
-    pageToggle += 1;
-    if (pageToggle >= 2) {
-      window.location.reload();
     }
-  }
+  };
 
   //----//  This function handles form submition --> It simply sends user content to props
   //----//  It also Takes user to the chat app home
@@ -49,12 +41,13 @@ class LoginPage extends Component {
       } else {
         returnLogs = await this.LoginHandler(myLoginData);
       }
+
       // Changes page IF user successfully Login or registers
       if (
         returnLogs !== null &&
         ["Login", "Register"].includes(returnLogs.checkInType)
       ) {
-        this.props.myDetails(returnLogs); // Set to props
+        Cookie("SET", { ...returnLogs });
         this.props.history.push("/chat");
       }
     }
@@ -67,14 +60,16 @@ class LoginPage extends Component {
       userLabel = dom[1];
 
     if (userName.offsetHeight === 0) {
-      userLabel.setAttribute("required","required");
-      alert("I see you want to Register,\n\n You can use a 'FAKE' Email or 'Username'. \n\nI will not collect any information that you provide beyond the use on this application. \n\n Cheers!")
+      userLabel.setAttribute("required", "required");
+      alert(
+        "I see you want to Register,\n\n You can use a 'FAKE' Email or 'Username'. \n\nI will not collect any information that you provide beyond the use on this application. \n\n Cheers!"
+      );
 
       // formgroup
       this.setState({
         avatar: {
           opacity: 1,
-          "marginTop": 0
+          marginTop: 0
         },
         userNameStyle: {
           display: "block"
@@ -85,7 +80,7 @@ class LoginPage extends Component {
       this.setState({
         avatar: {
           opacity: 0,
-          "marginTop": -230
+          marginTop: -230
         },
         userNameStyle: {
           display: "none"
@@ -122,7 +117,10 @@ class LoginPage extends Component {
         return myFormInfo;
       })
       .catch(error => {
-        return this.WarningHandler(error.message);
+        this.setState({
+          systemAlertMSG: error.message
+        });
+        return false;
       });
   }
 
@@ -134,7 +132,11 @@ class LoginPage extends Component {
         return { uuID: userInfo.user.uid, checkInType: "Login" };
       })
       .catch(error => {
-        return this.WarningHandler(error.message);
+        this.setState({
+          systemAlertMSG: error.message
+        });
+
+        return false;
       });
   }
 
@@ -166,36 +168,27 @@ class LoginPage extends Component {
 
     // Showing warnings to the user
     if (warnings !== "") {
-      return this.WarningHandler(warnings);
+      this.setState({
+        systemAlertMSG: warnings
+      });
+
+      return false;
     } else {
       return true;
     }
   }
 
-  //-----// This function handles all alerts, to let the user know whats wrong
-  WarningHandler = data => {
-    let alert = document.getElementById("Alert");
-    alert.innerText = data.replace(/\|/g, "\n");
-
+  // Broadcast this function to other files
+  systemWarning = data => {
     this.setState({
-      alert: { padding: 20 }
+      systemAlertMSG: data
     });
-
-    // Warning timeout
-    setTimeout(() => {
-      alert.innerText = "";
-      this.setState({
-        alert: { padding: 0 }
-      });
-    }, 5000);
-
-    return false;
   };
 
   render() {
     return (
       <section className="LoginSection">
-        <span id="Alert" style={this.state.alert} />
+        <SystemAlert systemAlertMSG={this.state.systemAlertMSG} />
 
         <div className="content container">
           <h3>Welcome to Chatome</h3>
@@ -207,7 +200,7 @@ class LoginPage extends Component {
             <div className="avatar" style={this.state.avatar}>
               <ProfilePic
                 imgStyle={this.state.avatar}
-                WarningHandler={this.WarningHandler}
+                systemWarning={this.systemWarning}
               />
             </div>
 
@@ -235,13 +228,14 @@ class LoginPage extends Component {
                 type="email"
                 placeholder="e.g: example@gmail.com"
                 id="email"
+                autoComplete="on"
                 required
               />
             </div>
 
             <div className="form-group">
               <label>*Password </label>
-              <input type="password" id="password" required />
+              <input type="password" id="password" autoComplete="on" required />
             </div>
 
             <input type="submit" id="Submit" />
@@ -252,15 +246,4 @@ class LoginPage extends Component {
   }
 }
 
-const mapDispatchToProps = dispatch => {
-  return {
-    myDetails: stutas => {
-      dispatch({ type: "UPDATE", data: stutas });
-    }
-  };
-};
-
-export default connect(
-  null,
-  mapDispatchToProps
-)(LoginPage);
+export default LoginPage;

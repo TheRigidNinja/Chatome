@@ -64,15 +64,15 @@ section {
 #status {
   position: absolute;
   background: #00cebc;
-  height: 20px;
-  width: 20px;
+  height: 17px;
+  width: 17px;
   border-radius: 50%;
   border: 3px solid white;
-  left: 35px;
-  top: 32px;
+  left: 43px;
+  top: 45px;
 }
 
-@media screen and (max-width: 600px), (max-height: 600px) {
+@media screen and (max-width: 600px) {
   section {
     max-height: 100%;
     max-width: 100%;
@@ -91,9 +91,6 @@ section {
   .navFooter {
     height: 50px !important;
     top: calc(100% - 50px) !important;
-  }
-  .MSGheader1 .msgPic {
-    padding-right: 30px;
   }
 }
 

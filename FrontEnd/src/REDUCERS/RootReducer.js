@@ -1,13 +1,10 @@
-import ProfileReducer from "./ProfileReducer"
+import ProfileReducer from "./ProfileReducer";
 import MessagingReducer from "./MessagingReducer";
-import ServerIDReducer from "./ServerIDReducer"
-import { combineReducers } from "redux"
+import { combineReducers } from "redux";
 
 const RootReducer = combineReducers({
-    ProfileDB: ProfileReducer,
-    MessagingDB: MessagingReducer,
-    ServerIDReducer: ServerIDReducer
+  ProfileDB: ProfileReducer,
+  MessagingDB: MessagingReducer
 });
 
 export default RootReducer;
-

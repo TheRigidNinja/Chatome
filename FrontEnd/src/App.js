@@ -1,20 +1,16 @@
-import React, { Component } from "react";
+import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Login from "./JS/LoginHandler/LoginPage";
-import ProfilePage from "./JS/ProfileHandler/MainPage";
+import MessagePage from "./JS/Home";
 
-class App extends Component {
-  render() {
-    return (
-      <BrowserRouter>
-        <Switch>
-          <Route exact path="/login" component={Login} />
-          <Route path="/chat" component={ProfilePage} />
-          <Route path="/" component={Login} />
-        </Switch>
-      </BrowserRouter>
-    );
-  }
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Switch>
+        <Route exact path="/login" component={Login} />
+        <Route path="/chat" component={MessagePage} />
+        <Route path="/" component={Login} />
+      </Switch>
+    </BrowserRouter>
+  );
 }
-
-export default App;

@@ -1,10 +1,7 @@
 import React from "react";
 import ReactHtmlParser from 'react-html-parser';
 
-export default function Chats({ ChatData, myUserName, ImgSrc }) {
-
-  // console.log("Active Chats");
-
+export default function Texts({ ChatData, myUserName, ImgSrc }) {
   const UserMessages = () => {
     if (ChatData) {
       return ChatData.map(msg => {
@@ -18,7 +15,7 @@ export default function Chats({ ChatData, myUserName, ImgSrc }) {
               <div>
                 <img src={ImgSrc} id="userIcon" alt="IMG" />
                 <label>{msg.name}</label>
-                <div>{ReactHtmlParser (msg.message)}</div>
+                <div>{ReactHtmlParser(msg.message)}</div>
               </div>
             </li>
           );
@@ -30,7 +27,7 @@ export default function Chats({ ChatData, myUserName, ImgSrc }) {
               <time>{msg.timeStamp}</time>
               <div>
                 <label>{msg.name}</label>
-                <div>{ReactHtmlParser (msg.message)}</div>
+                <div>{ReactHtmlParser(msg.message)}</div>
               </div>
             </li>
           );

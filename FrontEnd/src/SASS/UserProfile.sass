@@ -21,8 +21,8 @@
     border-radius: 0px 0px 30px 30px
     padding: 10px 20px
 
-
     .headerCont
+        transition: all .2s
         @extend %flexedEml
         flex-flow: row nowrap
 
@@ -56,7 +56,7 @@ img
     border-radius: 50%
 
 .inboxSection
-    padding: 20px 20px 0px 20px
+    padding: 20px 20px 50px 20px
     overflow: hidden
 
 .scollArea
@@ -75,7 +75,7 @@ img
 input[type="search"]
     position: relative
     width: 100%
-    padding: 10px
+    padding: 5px 10px
     border-radius: 8px
     outline: none
     font-size: 14px
@@ -85,70 +85,72 @@ input[type="search"]
     border: 2px solid transparent
     cursor: text
     color: rgba(0,0,0,0.7)
-    margin: 7px 0px
-    
 
     &:focus
         border: 2px solid rgba(63, 106, 255,.9)
 
-.onlinePeople
-    transition: all .3s
-    position: relative
-    width: 100%
-    overflow: hidden
-    overflow-x: scroll
-    -webkit-overflow-scrolling: touch
-    white-space: nowrap
-    margin-top: 10px
-    margin-bottom: 5px
+.SearchBar
+    display: flex
+    height: 40px
+    flex-flow: row nowrap
+    justify-content: center
+    align-items: center
+    margin: 10px 0px
+
+    span 
+        transition: all .2s
+        font-size: 16px
+        padding: 10px 20px
+        cursor: pointer 
 
 
-.Onlineperson
-    position: relative
-    display: inline-block
-    text-align: center
-    padding-right: 15px
+#OnlinePeople
+    text-align: end 
+    opacity: 1
 
-    :last-child
-        margin-right: 30px
-    
+#OnlinePeople span 
+    border-radius: 50%
+    margin: 0px 
+    padding: 5px 7px
+    font-size: 20px
+    background: rgba(0,120,178,0.2)
 
 .Person
-    transition: all 0.2s
     position: relative
     cursor: pointer
     width: 100%
     @extend %flexedEml
-    display: inline-flex
-    flex-flow: row
+    display: flex
+    flex-flow: row nowrap
     justify-content: flex-start
     padding: 0px
     margin: 0px
-    margin-bottom: 5px
-    height: 64px
-
+    margin-bottom: 20px
 
     img 
-        width: 50px
-        height: 50px
+        width: 60px
+        height: 60px
+        background-size: cover
+        background-position: center
+        overflow: hidden
+
+
+.Person:last-child
+    margin: 0px
     
 #ProfilePic
     position: relative
 
 time
     font-size: 12px
-    margin: 30px 0px 0px 0px
-    padding: 0px 5px
-    font-weight: bold
-    opacity: .5
-    text-align: center
+    font-weight: 500
+    color: rgba(58, 66, 79,.65)
     width: 100px
     white-space: nowrap
-    text-align: start
 
 .details
     position: relative
-    padding-left: 15px
+    padding-left: 5px
     display: flex
     flex-flow: column
     align-items: flex-start
@@ -163,6 +165,7 @@ time
         overflow: hidden
         font-weight: 500
         padding: 0px
+        padding-bottom: 5px
         margin: 0px
         color: rgb(58, 66, 79)
         
@@ -174,9 +177,8 @@ time
         margin: 0px
         max-width: 100%
         display: inline-block
-        font-size: 14px
-        color: rgba(58, 66, 79,.65)
-        font-weight: 430
+        font-size: 15px
+        color: rgba(58, 66, 79,.55)
 
 .navFooter
     width: 100%

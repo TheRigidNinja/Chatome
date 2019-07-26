@@ -30,7 +30,7 @@ function GetsCookie(key) {
   for (let i = 0; i < key.length; i++) {
     var re = new RegExp(key[i] + "=([^;]+)"),
       value = re.exec(document.cookie);
-      value = value != null ? value[1] : null;
+    value = value != null ? value[1] : null;
 
     Objvalues.push(value);
   }

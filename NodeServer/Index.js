@@ -21,7 +21,7 @@ io.on("connection", socket => {
   // --- // Gets All Profile data for all users
   socket.on("getUsersProfileDATA", async (req, key) => {
     let profileDataRetrieval = await profile.serveProfile(req);
-    
+
     // You get all the data from everybody
     socket.emit("returnUsersProfileDATA", profileDataRetrieval, "None");
 
@@ -36,11 +36,11 @@ io.on("connection", socket => {
     );
   });
 
-  // --- // Assigning room ID to user names so i can better identify who is who 
-  // For easy communication 
+  // --- // Assigning room ID to user names so i can better identify who is who
+  // For easy communication
   socket.on("UserDetails", res => {
-    rooms[res.myName] = res.roomID;
-    userDetails[res.myName] = { id: res.id, uuID: res.uuID };
+    rooms[res.userName] = res.roomID;
+    userDetails[res.userName] = { id: res.id, uuID: res.uuID };
   });
 
   // --- // Write messages to the DataBase
@@ -73,20 +73,22 @@ io.on("connection", socket => {
   });
 
   // --- // Handles getting individual accounts MSG from DataBase
-  socket.on("GetMessages", async (res, key) => {
+  socket.on("GetMessages", async (res, myName) => {
     var msgData = await messaging.serverMessaging(res);
-    io.emit("MSGChannel", msgData, key);
+
+    io.emit(rooms[myName] + "MSGChannel", msgData);
   });
 
   // --- // Handles video and Audio streaming
-  socket.on("GetStream", streamData => {
-    
+  socket.on("GetStream", (streamData, myName) => {
+    console.log(streamData, myName);
+    // app.get("/", (req, res) => {
+    //   res.send(streamData);
+    // });
     // streamHandle.VideoStreamHandle;
   });
 
-
-
-  // --- // Handles Disconnection 
+  // --- // Handles Disconnection
   socket.on("disconnect", async res => {
     var index = Object.values(rooms).indexOf(socket.id),
       roomUserName = Object.keys(rooms)[index];
