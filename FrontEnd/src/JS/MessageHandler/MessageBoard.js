@@ -441,11 +441,11 @@ export class MessageBoard extends Component {
               <img
                 style={{
                   backgroundImage:
-                    "url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRs-4j_db6aDDKJnLcLprBjRFX7cOesiVmGT-WysEUnemBUdEaJMw)"
+                    "url("+picture+")"
                 }}
                 alt=""
               />
-              <label>{"recipientData.name"}</label>
+              <label>{userName}</label>
               <small>Ringing...</small>
             </div>
 
