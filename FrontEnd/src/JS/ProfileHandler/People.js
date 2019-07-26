@@ -1,67 +1,44 @@
 import React from "react";
-// import LZString from "lz-string";
 
-export default function InboxPeople({
-  people,
-  togglePage,
-  myDataID,
-  latestChats
-}) {
-  var emojis = ["🙋", "😃", "🤗", "👋"],
-    myName = people[myDataID].userName,
-    chats = "",
-    timeStamp = "",
-    status,
-    paragraphStyle = {};
+export default function Chats({ people, togglePage, myDataID, latestChats }) {
+  //   var myName = people[myDataID].userName,
+  //     chats = "",
+  //     timeStamp = "",
+  //     status,
+  //     paragraphStyle = {};
+
+  people = ["Brian sHISANYA", "Matthew french"];
 
   const People = () => {
     return people.map(data => {
-      chats = `Say hello ${emojis[Math.floor(Math.random() * 4)]} to ${
-        data.userName
-      }`;
-      timeStamp = " ";
-      status = data.status === "Online" ? "status" : "";
-      paragraphStyle = {"font-weight": "700", "opacity": ".8"};
+      return (
+        <div
+          className="Person"
+          // messagekey={data.messageKey}
+          onClick={() => togglePage("MessagingBoard", "data.ID")}
+          key={Math.random()}
+        >
+          <span id="ProfilePic" key={Math.random()}>
+            <img
+              style={{
+                backgroundImage:
+                  "url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRs-4j_db6aDDKJnLcLprBjRFX7cOesiVmGT-WysEUnemBUdEaJMw)"
+              }}
+              key={Math.random()}
+              alt=""
+            />
 
-      if (data.ID !== myDataID) {
-        if (latestChats !== undefined && latestChats[data.userName]) {
-          let userDetail = latestChats[data.userName];
+            <span id={"status"} key={Math.random()} />
+          </span>
+          <div className="details" key={Math.random()}>
+            <h4 key={Math.random()}>{"Brian William Shisanya"}</h4>
+          </div>
 
-          // paragraphStyle
-          // Check to see if the text is from you or your friend
-          if (userDetail.recipient === myName) {
-            chats = " " + userDetail.message;
-          } else {
-            paragraphStyle = {};
-            chats = "You: " + userDetail.message;
-          }
-        }
-
-        return (
-          <>
-            <div
-              className="Person"
-              messagekey={data.messageKey}
-              onClick={() => togglePage("MessagingBoard", data.ID)}
-            >
-              <span id="ProfilePic">
-                <img src={data.picture} alt="IMG" />
-                <span id={status} />
-              </span>
-              <div className="details">
-                <h4>{data.userName}</h4>
-                <p style={paragraphStyle}>{chats}</p>
-              </div>
-              <time>{timeStamp}</time>
-            </div>
-          </>
-        );
-      } else {
-        return <></>;
-      }
+          <time key={Math.random()} id="OnlinePeople"><span role="img" aria-label="">👋</span></time>
+        </div>
+      );
     });
   };
 
-  // var PeopleDATA  = JSON.stringify(People());
   return <People />;
 }

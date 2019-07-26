@@ -3,12 +3,14 @@ const express = require("express"),
   http = require("http").Server(app),
   io = require("socket.io")(http),
   profile = require("./HANDLERS/ServeProfile"),
-  messaging = require("./HANDLERS/ServeMessaging");
+  messaging = require("./HANDLERS/ServeMessaging"),
+  streamHandle = require("./HANDLERS/StreamHandler");
 
 var rooms = {},
   userDetails = {},
   subscribedRooms = [];
 
+// Initialising // Connecting to the server
 io.on("connection", socket => {
   // --- // Checks user name if taken
   socket.on("FetchUserNames", async req => {
@@ -16,12 +18,12 @@ io.on("connection", socket => {
     socket.emit("ReturnUserNames", warning);
   });
 
-  // --- // Getting All Profile data for all users
+  // --- // Gets All Profile data for all users
   socket.on("getUsersProfileDATA", async (req, key) => {
     let profileDataRetrieval = await profile.serveProfile(req);
 
     // You get all the data from everybody
-    socket.emit("returnUsersProfileDATA", profileDataRetrieval,"None");
+    socket.emit("returnUsersProfileDATA", profileDataRetrieval, "None");
 
     // Everybody gets update about you
     socket.broadcast.emit(
@@ -29,18 +31,19 @@ io.on("connection", socket => {
       (() => {
         var onlineUser = profileDataRetrieval.myDataID;
         return profileDataRetrieval.people[onlineUser];
-      })(),"Broadcast"
+      })(),
+      "Broadcast"
     );
-
   });
 
-  // --- // Message communication handler
+  // --- // Assigning room ID to user names so i can better identify who is who
+  // For easy communication
   socket.on("UserDetails", res => {
-    rooms[res.myName] = res.roomID;
-    userDetails[res.myName] = { id: res.id, uuID: res.uuID };
+    rooms[res.userName] = res.roomID;
+    userDetails[res.userName] = { id: res.id, uuID: res.uuID };
   });
 
-  // --- // Write messages to the DB
+  // --- // Write messages to the DataBase
   socket.on("SendMessage", async (res, key, recipient) => {
     var newFriend = false,
       roomID = rooms[recipient.friend];
@@ -62,20 +65,30 @@ io.on("connection", socket => {
     // Sends message to the database
     var sendMSG = await messaging.sendMessage(res, key, recipient);
 
-    // Only works if you are a new friends to the persorn who send the MSG
+    // Only works if you are a new friends to the person who send the MSG
     if (newFriend === true) {
       res.messageKey = sendMSG;
       io.sockets.in(roomID).emit(roomID, res);
     }
   });
 
-  // // --- // Handles getting individual accounts MSG from DataBase
-  socket.on("GetMessages", async (res, key) => {
+  // --- // Handles getting individual accounts MSG from DataBase
+  socket.on("GetMessages", async (res, myName) => {
     var msgData = await messaging.serverMessaging(res);
-    io.emit("MSGChannel", msgData, key);
+
+    io.emit(rooms[myName] + "MSGChannel", msgData);
   });
 
-  // Handle Disconnection
+  // --- // Handles video and Audio streaming
+  socket.on("GetStream", (streamData, myName) => {
+    console.log(streamData, myName);
+    // app.get("/", (req, res) => {
+    //   res.send(streamData);
+    // });
+    // streamHandle.VideoStreamHandle;
+  });
+
+  // --- // Handles Disconnection
   socket.on("disconnect", async res => {
     var index = Object.values(rooms).indexOf(socket.id),
       roomUserName = Object.keys(rooms)[index];
@@ -93,34 +106,6 @@ io.on("connection", socket => {
     }
   });
 });
-
-// const mySqlDB = require("./HANDLERS/MySQLDB");
-// (async () => {
-//   var resLogin = { uuID: "8ADuY8NxkSd3MaqT3WM72ZEpznN2", checkInType: "Login" };
-//   var resRegister = {
-//     uuID: "AI5QLJJJnNVbK1OTzgfvxKblaX62",
-//     picture: "../public/img/User.svg",
-//     userName: "user56",
-//     status: "Online",
-//     ID: null,
-//     checkInType: "Register",
-//     messageKey: "29b.9e9ad4aaeea",
-//     phoneUpdate: 1559710329000,
-//     accountCreatedDATE: 1559710329000,
-//     emailUpdate: 1559710329000,
-//     pictureUpdate: 1559710329000
-//   };
-
-//   var res = {
-//       msg: "Hello",
-//       checkInType: "Chats",
-//       messageKey: "2ee.31466e7a912ee.31466e7a91",
-//       name: "TheRigidNinja",
-//       timeStamp: 1559907165000
-//     },
-//     dbType = { db: "TestingDB", dbTable: "Test1" };
-//   console.log(await mySqlDB.DataTomySQL(resRegister, dbType));
-// })//();
 
 // ---- // Middleware
 // app.get("/users",(req,res)=>{res.render("Inbox")});

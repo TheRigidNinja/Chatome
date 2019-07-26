@@ -1,0 +1,143 @@
+.userTyping {
+  position: relative;
+  background: #343458;
+  width: 100%;
+  margin: 0px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: column nowrap;
+          flex-flow: column nowrap;
+}
+
+.messageTools {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: row nowrap;
+          flex-flow: row nowrap;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  font-size: 25px;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.messageTools span {
+  white-space: nowrap;
+}
+
+.messageTools i {
+  cursor: pointer;
+  color: white;
+}
+
+.InsertImage {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: auto;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: row nowrap;
+          flex-flow: row nowrap;
+}
+
+.optionIcons {
+  -webkit-transition: all .1s;
+  transition: all .1s;
+  margin: 0px !important;
+  padding: 0px !important;
+  overflow: hidden;
+  width: 160px;
+}
+
+.InsertImage i {
+  margin: 10px;
+  color: white;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.InsertImage .fa-chevron-right {
+  -webkit-transition: all .2s;
+  transition: all .2s;
+  margin-right: 0px !important;
+}
+
+.submitMessage {
+  font-size: 22px;
+  background: #f5f5fc;
+  padding: 0px 7px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.submitMessage i {
+  color: #6b8af4;
+}
+
+.submitMessage:hover {
+  background: #6b8af4;
+  color: white;
+}
+
+.submitMessage:hover i {
+  color: white;
+}
+
+.TextArea {
+  position: relative;
+  width: 100%;
+  margin: 2px 8px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.TextArea textarea {
+  width: 100%;
+  min-height: 35px;
+  height: 35px;
+  margin: 0px;
+  font-size: 14px;
+  padding: 5px 10px;
+  padding-right: 30px;
+  resize: none;
+  outline: none;
+  border: none;
+  border-radius: 20px;
+}
+
+#emoji {
+  position: absolute;
+  margin: 0px;
+  padding: 0px;
+  top: calc(50% - 13px);
+  left: calc(100% - 30px);
+  color: #343a40;
+}
+
+.iconToggle {
+  opacity: 0 !important;
+  width: 0px !important;
+  margin: 0px 10px !important;
+}
+
+.iconToggleUp {
+  margin-top: -40px !important;
+}
+
+.pushUp {
+  top: 80px !important;
+}
+
+.pushFullUp {
+  top: 0px !important;
+}

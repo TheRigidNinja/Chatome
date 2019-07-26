@@ -10,7 +10,7 @@
 
 .LoginSection {
   position: relative;
-  background: #5a51a5 !important;
+  background: #5b5b96 !important;
 }
 
 .LoginSection:before, .LoginSection:after {
@@ -31,26 +31,26 @@
   left: 20px;
 }
 
-#Alert {
-  -webkit-transition: all cubic-bezier(0.82, 0.01, 0.42, 0.84) 0.2s;
-  transition: all cubic-bezier(0.82, 0.01, 0.42, 0.84) 0.2s;
-  height: auto;
-  background: #202651;
-  color: white;
-  padding: 0px;
-  border-radius: 0px 0px 100px 100px;
-  text-align: center;
-  z-index: 3;
-}
-
 .LoginForm {
   position: relative;
   z-index: 1;
   background: white;
-  border-radius: 5px;
+  border-radius: 10px;
   margin-bottom: 20px;
   -webkit-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.158);
           box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.158);
+}
+
+#Alert {
+  -webkit-transition: all .2s;
+  transition: all .2s;
+  height: auto;
+  background: #202651;
+  color: white;
+  padding: 0px;
+  border-radius: 0px 0px 60px 60px;
+  text-align: center;
+  z-index: 10;
 }
 
 .content {

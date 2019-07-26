@@ -7,11 +7,10 @@
     left: 0px
     top: 0px
 
-    
 .LoginSection 
     position: relative
-    background: #5a51a5 !important
-
+    background: #5b5b96 !important
+    
 .LoginSection:before , .LoginSection:after
     height: 500px
     width: 320px
@@ -25,27 +24,27 @@
   
 .LoginSection:before
     top: calc(100% - 150px)
-    // transform: rotate(60deg)
     left: 20px 
-
-#Alert
-    transition: all cubic-bezier(.82,.01,.42,.84) .2s
-    @extend %resetELm
-    height: auto
-    background: #202651
-    color: white
-    padding: 0px
-    border-radius: 0px 0px 100px 100px
-    text-align: center
-    z-index: 3
 
 .LoginForm
     position: relative
     z-index: 1
     background: white
-    border-radius: 5px
+    border-radius: 10px
     margin-bottom: 20px
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.158)
+
+
+#Alert
+    transition: all .2s
+    @extend %resetELm
+    height: auto
+    background: #202651
+    color: white
+    padding: 0px
+    border-radius: 0px 0px 60px 60px
+    text-align: center
+    z-index: 10
 
 
 .content
@@ -59,11 +58,11 @@
     
 .form-group
     margin: 15px 0px
-    
+
 .LoginForm
     overflow: hidden
     padding: 60px 20px
-
+    
 /* --------------- Avitar Section --------------- */
 %avatarProfile
     width: 200px
