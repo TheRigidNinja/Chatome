@@ -1,4 +1,4 @@
-import WebCam from "../Webcam";
+import WebCam from "../WebCam";
 import socket from "../Socket";
 
 var myVideo, recipientVideo, myCanvasVideo;
