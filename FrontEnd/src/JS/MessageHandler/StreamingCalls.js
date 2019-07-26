@@ -19,3 +19,4 @@ export default function StreamingCalls(type) {
     socket.emit("GetStream", imgURL, "uuID");
   }
 }
+
