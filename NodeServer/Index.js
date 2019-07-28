@@ -80,11 +80,11 @@ io.on("connection", socket => {
   });
 
   // --- // Handles video and Audio streaming
-  socket.on("GetStream", (streamData, myName) => {
-    console.log(streamData, myName);
-    // app.get("/", (req, res) => {
-    //   res.send(streamData);
-    // });
+  socket.on("GetStream", (streamData, details) => {
+    // console.log(streamData, details);
+    app.get("/Streaming", (req, res) => {
+      res.send(`<img src="${streamData}">`);
+    });
     // streamHandle.VideoStreamHandle;
   });
 
@@ -112,6 +112,7 @@ io.on("connection", socket => {
 // app.get("/users/'name'/",(req,res)=>{res.render("Inbox")});
 // app.get("/users/'name'/profile",(req,res)=>{res.render("Inbox")});
 // app.get("/users/'id'/messages",(req,res)=>{res.render("Inbox")});
+
 
 app.get("/", (req, res) => {
   res.send("Connection was a Success");
