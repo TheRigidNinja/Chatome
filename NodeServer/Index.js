@@ -82,9 +82,6 @@ io.on("connection", socket => {
   // --- // Handles video and Audio streaming
   socket.on("GetStream", (streamData, details) => {
     // console.log(streamData, details);
-    app.get("/Streaming", (req, res) => {
-      res.send(`<img src="${streamData}">`);
-    });
     // streamHandle.VideoStreamHandle;
   });
 

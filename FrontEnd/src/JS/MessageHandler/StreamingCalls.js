@@ -19,7 +19,6 @@ export default function StreamingCalls(type, details) {
   } else {
     // Starts stream videos to server
     const imgURL = myCanvasVideo.toDataURL("image/jpeg", 0.5);
-
     socket.emit("GetStream", imgURL, details);
 
     // this is just a test to see if this will work
