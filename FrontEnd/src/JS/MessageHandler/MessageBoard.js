@@ -24,12 +24,17 @@ export class MessageBoard extends Component {
     // Tries to get User MSG after Page loads from server
     if (!this.state.ChatsUpdated) {
       this.initialGetMessageFromServer();
+      this.messageScroll();
     }
 
+    // console.log(this.props);
     // if (this.props.inboxState.toggleType === "MessagingBoard") {
     //   // Scrolls message Board
     //   this.messageScroll();
     // }
+
+    console.log("Scroll");
+    this.messageScroll();
   }
 
   // This is the process of getting Pre- Messages from Online DataBase
@@ -66,60 +71,56 @@ export class MessageBoard extends Component {
     });
   };
 
-  // // ----- // Scrolls Down Messages from the Message Dashboard
-  // messageScroll() {
-  //   var chatScrollHght = document.querySelector(".msgDashboard");
-  //   chatScrollHght.scrollTop = chatScrollHght.scrollHeight;
-  // }
+  // ----- // Scrolls Down Messages from the Message Dashboard
+  messageScroll =()=> {
+    var chatScrollHght = document.querySelector(".msgDashboard");
+    chatScrollHght.scrollTop = chatScrollHght.scrollHeight;
+  }
 
   // ----- // Function that handles Sending Messages to the server
-  // sendMessageToServer = (myUserName, checkKey, key2) => {
-  //   var recipient = this.props.inboxState,
-  //     recipientName = {
-  //       friend: recipient.people[recipient.activeChatID].userName,
-  //       me: recipient.people[recipient.myDataID].userName
-  //     },
-  //     userMSGForm = {
-  //       message: document.querySelector(".MSGBox").innerHTML,
-  //       checkInType: "Register",
-  //       messageKey: checkKey,
-  //       name: myUserName,
-  //       recipient: recipientName.friend,
-  //       uuID: Cookie("GET", ["uuID"])[0],
-  //       timeStamp: Date.parse(new Date())
-  //     };
+  sendMessageToServer = (friendGroup, checkKey, key2) => {
+    var msgTextarea = document.querySelector("textarea"),
+      userMSGForm = {
+        message: msgTextarea.value,
+        checkInType: "Register",
+        messageKey: checkKey,
+        name: friendGroup.me,
+        recipient: friendGroup.friend,
+        uuID: this.props.myData.uuID,
+        timeStamp: Date.parse(new Date())
+      };
 
-  //   console.log(userMSGForm.message);
-  //   // Makes sure MSG box is not empty
-  //   if (
-  //     userMSGForm.message.trim() !== "" &&
-  //     userMSGForm.message.length <= 3000
-  //   ) {
-  //     // ----- // Sends Message to the server Here
-  //     console.log("Sending");
-  //     socket.emit("SendMessage", userMSGForm, userMSGForm.uuID, recipientName);
+    // Makes sure MSG box is not empty
+    if (
+      userMSGForm.message.trim() !== "" &&
+      userMSGForm.message.length <= 3000
+    ) {
+      // ----- // Sends Message to the server Here
+      console.log("Sending");
+      // socket.emit("SendMessage", userMSGForm, userMSGForm.uuID, recipientName);
 
-  //     delete userMSGForm.uuID;
-  //     delete userMSGForm.messageKey;
-  //     delete userMSGForm.checkInType;
+      delete userMSGForm.uuID;
+      delete userMSGForm.messageKey;
+      delete userMSGForm.checkInType;
 
-  //     var localMSG = this.state.myMSGRoom[key2];
-  //     localMSG = localMSG ? localMSG : [];
+      var localMSG = this.state.myMSGRoom[key2];
+      localMSG = localMSG ? localMSG : [];
 
-  //     this.setState(
-  //       {
-  //         myMSGRoom: {
-  //           ...this.state.myMSGRoom,
-  //           [key2]: [...localMSG, userMSGForm]
-  //         }
-  //       },
-  //       () => {
-  //         // Get latest MSG
-  //         this.handleLastChats("GetLocalMSG");
-  //       }
-  //     );
-  //   }
-  // };
+      this.setState(
+        {
+          myMSGRoom: {
+            ...this.state.myMSGRoom,
+            [key2]: [...localMSG, userMSGForm]
+          }
+        },
+        () => {
+          msgTextarea.value = "";
+          // Get latest MSG
+          // this.handleLastChats("GetLocalMSG");
+        }
+      );
+    }
+  };
 
   // // ----- // Gets any messages from friends of people wanting to be friends
   // getFriendMessage = myDetail => {
@@ -292,9 +293,9 @@ export class MessageBoard extends Component {
     let main = document.querySelector(".InsertImage"),
       arrow = main.querySelector(".fa-chevron-right"),
       icons = main.querySelector(".optionIcons");
-      // gallery = main.querySelector(".fa-mountain"),
-      // upload = main.querySelector(".fa-image"),
-      // photo = main.querySelector(".fa-camera-retro");
+    // gallery = main.querySelector(".fa-mountain"),
+    // upload = main.querySelector(".fa-image"),
+    // photo = main.querySelector(".fa-camera-retro");
 
     if (text.length > 0 && arrow.classList[2] === "iconToggle") {
       arrow.classList.remove("iconToggle");
@@ -424,7 +425,16 @@ export class MessageBoard extends Component {
                 <i className="fas fa-laugh" id="emoji" />
               </span>
 
-              <span className="submitMessage">
+              <span
+                className="submitMessage"
+                onClick={() =>
+                  this.sendMessageToServer(
+                    { me: myUserName, friend: userName },
+                    checkKey,
+                    key2
+                  )
+                }
+              >
                 <i className="fas fa-arrow-up" id="submitMessage" />
               </span>
             </div>
@@ -440,8 +450,7 @@ export class MessageBoard extends Component {
             <div className="PhoneProfile">
               <img
                 style={{
-                  backgroundImage:
-                    "url("+picture+")"
+                  backgroundImage: "url(" + picture + ")"
                 }}
                 alt=""
               />
