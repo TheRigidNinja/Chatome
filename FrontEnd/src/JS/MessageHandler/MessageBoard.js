@@ -24,12 +24,17 @@ export class MessageBoard extends Component {
     // Tries to get User MSG after Page loads from server
     if (!this.state.ChatsUpdated) {
       this.initialGetMessageFromServer();
+      this.messageScroll();
     }
 
+    // console.log(this.props);
     // if (this.props.inboxState.toggleType === "MessagingBoard") {
     //   // Scrolls message Board
     //   this.messageScroll();
     // }
+
+    console.log("Scroll");
+    this.messageScroll();
   }
 
   // This is the process of getting Pre- Messages from Online DataBase
@@ -66,60 +71,56 @@ export class MessageBoard extends Component {
     });
   };
 
-  // // ----- // Scrolls Down Messages from the Message Dashboard
-  // messageScroll() {
-  //   var chatScrollHght = document.querySelector(".msgDashboard");
-  //   chatScrollHght.scrollTop = chatScrollHght.scrollHeight;
-  // }
+  // ----- // Scrolls Down Messages from the Message Dashboard
+  messageScroll = () => {
+    var chatScrollHght = document.querySelector(".msgDashboard");
+    chatScrollHght.scrollTop = chatScrollHght.scrollHeight;
+  };
 
   // ----- // Function that handles Sending Messages to the server
-  // sendMessageToServer = (myUserName, checkKey, key2) => {
-  //   var recipient = this.props.inboxState,
-  //     recipientName = {
-  //       friend: recipient.people[recipient.activeChatID].userName,
-  //       me: recipient.people[recipient.myDataID].userName
-  //     },
-  //     userMSGForm = {
-  //       message: document.querySelector(".MSGBox").innerHTML,
-  //       checkInType: "Register",
-  //       messageKey: checkKey,
-  //       name: myUserName,
-  //       recipient: recipientName.friend,
-  //       uuID: Cookie("GET", ["uuID"])[0],
-  //       timeStamp: Date.parse(new Date())
-  //     };
+  sendMessageToServer = (friendGroup, checkKey, key2) => {
+    var msgTextarea = document.querySelector("textarea"),
+      userMSGForm = {
+        message: msgTextarea.value,
+        checkInType: "Register",
+        messageKey: checkKey,
+        name: friendGroup.me,
+        recipient: friendGroup.friend,
+        uuID: this.props.myData.uuID,
+        timeStamp: Date.parse(new Date())
+      };
 
-  //   console.log(userMSGForm.message);
-  //   // Makes sure MSG box is not empty
-  //   if (
-  //     userMSGForm.message.trim() !== "" &&
-  //     userMSGForm.message.length <= 3000
-  //   ) {
-  //     // ----- // Sends Message to the server Here
-  //     console.log("Sending");
-  //     socket.emit("SendMessage", userMSGForm, userMSGForm.uuID, recipientName);
+    // Makes sure MSG box is not empty
+    if (
+      userMSGForm.message.trim() !== "" &&
+      userMSGForm.message.length <= 3000
+    ) {
+      // ----- // Sends Message to the server Here
+      console.log("Sending");
+      // socket.emit("SendMessage", userMSGForm, userMSGForm.uuID, recipientName);
 
-  //     delete userMSGForm.uuID;
-  //     delete userMSGForm.messageKey;
-  //     delete userMSGForm.checkInType;
+      delete userMSGForm.uuID;
+      delete userMSGForm.messageKey;
+      delete userMSGForm.checkInType;
 
-  //     var localMSG = this.state.myMSGRoom[key2];
-  //     localMSG = localMSG ? localMSG : [];
+      var localMSG = this.state.myMSGRoom[key2];
+      localMSG = localMSG ? localMSG : [];
 
-  //     this.setState(
-  //       {
-  //         myMSGRoom: {
-  //           ...this.state.myMSGRoom,
-  //           [key2]: [...localMSG, userMSGForm]
-  //         }
-  //       },
-  //       () => {
-  //         // Get latest MSG
-  //         this.handleLastChats("GetLocalMSG");
-  //       }
-  //     );
-  //   }
-  // };
+      this.setState(
+        {
+          myMSGRoom: {
+            ...this.state.myMSGRoom,
+            [key2]: [...localMSG, userMSGForm]
+          }
+        },
+        () => {
+          msgTextarea.value = "";
+          // Get latest MSG
+          // this.handleLastChats("GetLocalMSG");
+        }
+      );
+    }
+  };
 
   // // ----- // Gets any messages from friends of people wanting to be friends
   // getFriendMessage = myDetail => {
@@ -226,7 +227,7 @@ export class MessageBoard extends Component {
   // };
 
   // ----- // Handles Video or Audio Call Actions
-  HandlePhoneCall = type => {
+  HandlePhoneCall = (type, details) => {
     let myCanvasVideo = document.querySelector("#myCanvasVideo"),
       ControlCont = document.querySelector(".ControlCont"),
       ButtonsCont = document.querySelector(".ButtonsCont"),
@@ -264,7 +265,7 @@ export class MessageBoard extends Component {
     }
 
     // Actually Starts the Action Audio or Video transmition
-    StreamingCalls(type);
+    StreamingCalls(type, details);
 
     if (this.state.PhoneCallStyle.display === "none" || type === "MSG") {
       let displayType1 =
@@ -292,9 +293,9 @@ export class MessageBoard extends Component {
     let main = document.querySelector(".InsertImage"),
       arrow = main.querySelector(".fa-chevron-right"),
       icons = main.querySelector(".optionIcons");
-      // gallery = main.querySelector(".fa-mountain"),
-      // upload = main.querySelector(".fa-image"),
-      // photo = main.querySelector(".fa-camera-retro");
+    // gallery = main.querySelector(".fa-mountain"),
+    // upload = main.querySelector(".fa-image"),
+    // photo = main.querySelector(".fa-camera-retro");
 
     if (text.length > 0 && arrow.classList[2] === "iconToggle") {
       arrow.classList.remove("iconToggle");
@@ -377,11 +378,21 @@ export class MessageBoard extends Component {
             <div className="header2">
               <i
                 className="fas fa-phone"
-                onClick={() => this.HandlePhoneCall("phone")}
+                onClick={() =>
+                  this.HandlePhoneCall("phone", {
+                    me: myUserName,
+                    friend: userName
+                  })
+                }
               />
               <i
                 className="fas fa-video"
-                onClick={() => this.HandlePhoneCall("video")}
+                onClick={() =>
+                  this.HandlePhoneCall("video", {
+                    me: myUserName,
+                    friend: userName
+                  })
+                }
               />
             </div>
           </div>
@@ -424,7 +435,16 @@ export class MessageBoard extends Component {
                 <i className="fas fa-laugh" id="emoji" />
               </span>
 
-              <span className="submitMessage">
+              <span
+                className="submitMessage"
+                onClick={() =>
+                  this.sendMessageToServer(
+                    { me: myUserName, friend: userName },
+                    checkKey,
+                    key2
+                  )
+                }
+              >
                 <i className="fas fa-arrow-up" id="submitMessage" />
               </span>
             </div>
@@ -440,12 +460,11 @@ export class MessageBoard extends Component {
             <div className="PhoneProfile">
               <img
                 style={{
-                  backgroundImage:
-                    "url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRs-4j_db6aDDKJnLcLprBjRFX7cOesiVmGT-WysEUnemBUdEaJMw)"
+                  backgroundImage: "url(" + picture + ")"
                 }}
                 alt=""
               />
-              <label>{"recipientData.name"}</label>
+              <label>{userName}</label>
               <small>Ringing...</small>
             </div>
 
@@ -460,7 +479,12 @@ export class MessageBoard extends Component {
                   <label>Speaker</label>
                 </span>
                 <span
-                  onClick={event => this.HandlePhoneCall("videoToggle")}
+                  onClick={event =>
+                    this.HandlePhoneCall("videoToggle", {
+                      me: myUserName,
+                      friend: userName
+                    })
+                  }
                   id="videoToggle"
                   className=""
                 >
@@ -470,7 +494,14 @@ export class MessageBoard extends Component {
               </div>
 
               <div className="endCall">
-                <span onClick={() => this.HandlePhoneCall("MSG")}>
+                <span
+                  onClick={() =>
+                    this.HandlePhoneCall("MSG", {
+                      me: myUserName,
+                      friend: userName
+                    })
+                  }
+                >
                   <i className="fas fa-phone" />
                 </span>
               </div>

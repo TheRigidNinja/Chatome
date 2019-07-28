@@ -7,8 +7,11 @@
 
 import StreamingCalls from "./MessageHandler/StreamingCalls";
 
+var endStream = false;
+
 export default function WebCam(dataType, video, canvas) {
-  console.log(video);
+  endStream = dataType === "MSG" ? true : false;
+
   let controls = {
     dataType: dataType,
     audio: true,
@@ -77,17 +80,27 @@ function startMedia(controls) {
 
     const begin = Date.now();
     const context = controls.canvas.getContext("2d");
-    context.drawImage(
-      controls.video,
-      0,
-      0,
-      300,
-      150
-    );
+    context.drawImage(controls.video, 0, 0, 300, 150);
     const delay = 1000 / FPS - (Date.now() - begin);
     setTimeout(processVideo, delay);
 
     // Start calling the function to broadCast Images
     StreamingCalls("Stream");
+
+    // Ends the call if requested
+    if (endStream) {
+      endCall(controls.video);
+    }
+  }
+
+  function endCall(video) {
+    video.pause();
+    video.srcObject = null;
+    streamActive = false;
+    if (streamData) {
+      streamData.getTracks().forEach(track => {
+        track.stop();
+      });
+    }
   }
 }
