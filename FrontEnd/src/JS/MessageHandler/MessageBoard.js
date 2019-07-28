@@ -72,10 +72,10 @@ export class MessageBoard extends Component {
   };
 
   // ----- // Scrolls Down Messages from the Message Dashboard
-  messageScroll =()=> {
+  messageScroll = () => {
     var chatScrollHght = document.querySelector(".msgDashboard");
     chatScrollHght.scrollTop = chatScrollHght.scrollHeight;
-  }
+  };
 
   // ----- // Function that handles Sending Messages to the server
   sendMessageToServer = (friendGroup, checkKey, key2) => {
@@ -227,7 +227,7 @@ export class MessageBoard extends Component {
   // };
 
   // ----- // Handles Video or Audio Call Actions
-  HandlePhoneCall = type => {
+  HandlePhoneCall = (type, details) => {
     let myCanvasVideo = document.querySelector("#myCanvasVideo"),
       ControlCont = document.querySelector(".ControlCont"),
       ButtonsCont = document.querySelector(".ButtonsCont"),
@@ -265,7 +265,7 @@ export class MessageBoard extends Component {
     }
 
     // Actually Starts the Action Audio or Video transmition
-    StreamingCalls(type);
+    StreamingCalls(type, details);
 
     if (this.state.PhoneCallStyle.display === "none" || type === "MSG") {
       let displayType1 =
@@ -378,11 +378,21 @@ export class MessageBoard extends Component {
             <div className="header2">
               <i
                 className="fas fa-phone"
-                onClick={() => this.HandlePhoneCall("phone")}
+                onClick={() =>
+                  this.HandlePhoneCall("phone", {
+                    me: myUserName,
+                    friend: userName
+                  })
+                }
               />
               <i
                 className="fas fa-video"
-                onClick={() => this.HandlePhoneCall("video")}
+                onClick={() =>
+                  this.HandlePhoneCall("video", {
+                    me: myUserName,
+                    friend: userName
+                  })
+                }
               />
             </div>
           </div>
@@ -469,7 +479,12 @@ export class MessageBoard extends Component {
                   <label>Speaker</label>
                 </span>
                 <span
-                  onClick={event => this.HandlePhoneCall("videoToggle")}
+                  onClick={event =>
+                    this.HandlePhoneCall("videoToggle", {
+                      me: myUserName,
+                      friend: userName
+                    })
+                  }
                   id="videoToggle"
                   className=""
                 >
@@ -479,7 +494,14 @@ export class MessageBoard extends Component {
               </div>
 
               <div className="endCall">
-                <span onClick={() => this.HandlePhoneCall("MSG")}>
+                <span
+                  onClick={() =>
+                    this.HandlePhoneCall("MSG", {
+                      me: myUserName,
+                      friend: userName
+                    })
+                  }
+                >
                   <i className="fas fa-phone" />
                 </span>
               </div>
