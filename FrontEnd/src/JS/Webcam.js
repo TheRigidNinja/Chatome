@@ -7,8 +7,11 @@
 
 import StreamingCalls from "./MessageHandler/StreamingCalls";
 
+var endStream = false;
+
 export default function WebCam(dataType, video, canvas) {
-  console.log(video);
+  endStream = dataType === "MSG" ? true : false;
+
   let controls = {
     dataType: dataType,
     audio: true,
@@ -85,9 +88,9 @@ function startMedia(controls) {
     StreamingCalls("Stream");
 
     // Ends the call if requested
-    // if (phoneType === "MSG") {
-    // endCall(video);
-    // }
+    if (endStream) {
+      endCall(controls.video);
+    }
   }
 
   function endCall(video) {
