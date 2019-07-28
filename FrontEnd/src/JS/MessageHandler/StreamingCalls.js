@@ -8,6 +8,9 @@ export default function StreamingCalls(type, details) {
     myVideo = document.querySelector(".myVideo");
     recipientVideo = document.querySelector("#recipientVideo");
     myCanvasVideo = document.querySelector("#myCanvasVideo");
+    
+    // Gets the Recipient Call Ready
+    recipientHandler();
 
     if (type === "phone") {
       type = "continuousAudio";
@@ -23,4 +26,15 @@ export default function StreamingCalls(type, details) {
 
     // this is just a test to see if this will work
   }
+}
+
+
+
+
+// This is a place where you get to see the recipientVideo / Audio
+
+function recipientHandler() {
+  socket.on("GetStreamData", streamData => {
+
+  });
 }
