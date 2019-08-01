@@ -131,6 +131,7 @@ io.on("connection", socket => {
 // app.get("/users/'name'/profile",(req,res)=>{res.render("Inbox")});
 // app.get("/users/'id'/messages",(req,res)=>{res.render("Inbox")});
 
+
 app.get("/", (req, res) => {
   res.send("Connection was a Success");
 });

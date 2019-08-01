@@ -82,12 +82,14 @@ export class MessageBoard extends Component {
         message: msgTextarea.value,
         checkInType: "Register",
         messageKey: checkKey,
+
         uuID: this.props.myData.uuID,
         timeStamp: Date.parse(new Date()),
         name: friendGroup.me
       };
 
     console.log(friendGroup);
+
     // Makes sure MSG box is not empty
     if (
       userMSGForm.message.trim() !== "" &&
@@ -95,6 +97,7 @@ export class MessageBoard extends Component {
     ) {
       // ----- // Sends Message to the server Here
       console.log("Sending");
+
       socket.emit("SendMessage", userMSGForm, userMSGForm.uuID, friendGroup.friend);
 
       delete userMSGForm.uuID;
@@ -114,9 +117,11 @@ export class MessageBoard extends Component {
         () => {
           msgTextarea.value = "";
           // Get latest MSG
+
           this.handleLastChats("GetLocalMSG");
         }
       );
+
     }
   };
 
@@ -215,6 +220,7 @@ export class MessageBoard extends Component {
         break;
 
       default:
+
       // Clear Text Area After setting to state
       // if (document.querySelector(".MSGBox")) {
       //   document.querySelector(".MSGBox").innerHTML = "";
@@ -224,6 +230,7 @@ export class MessageBoard extends Component {
       //   ...this.props.profileDetails.latestChats,
       //   ...lastChats
       // });
+
     }
   };
 
@@ -315,6 +322,7 @@ export class MessageBoard extends Component {
             <div className="header2">
               <i
                 className="fas fa-phone"
+
                 // onClick={() =>
                 //   this.HandlePhoneCall("phone", {
                 //     me: myUserName,
@@ -330,6 +338,7 @@ export class MessageBoard extends Component {
                 //     friend: userName
                 //   })
                 // }
+
               />
             </div>
           </div>
@@ -416,12 +425,14 @@ export class MessageBoard extends Component {
                   <label>Speaker</label>
                 </span>
                 <span
+
                   // onClick={event =>
                   //   this.HandlePhoneCall("videoToggle", {
                   //     me: myUserName,
                   //     friend: userName
                   //   })
                   // }
+
                   id="videoToggle"
                   className=""
                 >
@@ -432,12 +443,14 @@ export class MessageBoard extends Component {
 
               <div className="endCall">
                 <span
+
                   // onClick={() =>
                   //   this.HandlePhoneCall("MSG", {
                   //     me: myUserName,
                   //     friend: userName
                   //   })
                   // }
+
                 >
                   <i className="fas fa-phone" />
                 </span>

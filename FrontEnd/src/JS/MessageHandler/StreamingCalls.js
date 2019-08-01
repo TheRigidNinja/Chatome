@@ -9,6 +9,9 @@ export default function StreamingCalls(type, details) {
     myVideo = document.querySelector(".myVideo");
     recipientVideo = document.querySelector("#recipientVideo");
     myCanvasVideo = document.querySelector("#myCanvasVideo");
+    
+    // Gets the Recipient Call Ready
+    recipientHandler();
 
     if (type === "phone") {
       type = "continuousAudio";
@@ -19,8 +22,10 @@ export default function StreamingCalls(type, details) {
     WebCam(type, myVideo, myCanvasVideo);
   } else {
     // Starts stream videos to server
+
     // const imgURL = myCanvasVideo.toDataURL("image/jpeg", 0.5);
     // socket.emit("GetStream", imgURL, details);
+
 
     // this is just a test to see if this will work
   }
