@@ -39,20 +39,22 @@ io.on("connection", socket => {
   // --- // Assigning room ID to user names so i can better identify who is who
   // For easy communication
   socket.on("UserDetails", res => {
+    // console.log(res)
     rooms[res.userName] = res.roomID;
     userDetails[res.userName] = { id: res.id, uuID: res.uuID };
   });
 
   // --- // Write messages to the DataBase
-  socket.on("SendMessage", async (res, key, recipient) => {
+  socket.on("SendMessage", async (res, key, friend) => {
     var newFriend = false,
-      roomID = rooms[recipient.friend];
+      roomID = rooms[friend];
 
+    // console.log(roomID,res)
     if (roomID) {
       // Subscribe to a room if needed
-      if (!subscribedRooms[recipient.friend]) {
+      if (!subscribedRooms[friend]) {
         socket.join(roomID);
-        subscribedRooms[recipient.friend] = "";
+        subscribedRooms[friend] = "";
       }
 
       if (!/[|]/g.test(res.messageKey)) {
@@ -63,7 +65,7 @@ io.on("connection", socket => {
     }
 
     // Sends message to the database
-    var sendMSG = await messaging.sendMessage(res, key, recipient);
+    var sendMSG = await messaging.sendMessage(res, key, friend);
 
     // Only works if you are a new friends to the person who send the MSG
     if (newFriend === true) {
@@ -86,8 +88,27 @@ io.on("connection", socket => {
   });
 
   // --- // Handles Disconnection
-  socket.on("disconnect", async res => {
-    var index = Object.values(rooms).indexOf(socket.id),
+  socket.on("disconnect", res => {
+    disconnectUsers(socket.id);
+  });
+
+  // // Sends a pulse to user if they are online otherwise disconnect them
+  // var activeRooms = {};
+  // socket.on("ActiveRoomsCheckIn", res => {
+  //   activeRooms[res] = "";
+  // });
+
+  // setInterval(() => {
+  //   Object.values(rooms).forEach(elm => {
+  //     if (!Object.keys(activeRooms).includes(elm)) {
+  //       disconnectUsers(elm);
+  //     }
+  //   });
+
+  // }, 1000 * 10);
+
+  async function disconnectUsers(socketID) {
+    var index = Object.values(rooms).indexOf(socketID),
       roomUserName = Object.keys(rooms)[index];
 
     if (userDetails[roomUserName]) {
@@ -101,7 +122,7 @@ io.on("connection", socket => {
       delete subscribedRooms[roomUserName];
       socket.leave(rooms[roomUserName]);
     }
-  });
+  }
 });
 
 // ---- // Middleware
@@ -109,7 +130,6 @@ io.on("connection", socket => {
 // app.get("/users/'name'/",(req,res)=>{res.render("Inbox")});
 // app.get("/users/'name'/profile",(req,res)=>{res.render("Inbox")});
 // app.get("/users/'id'/messages",(req,res)=>{res.render("Inbox")});
-
 
 app.get("/", (req, res) => {
   res.send("Connection was a Success");

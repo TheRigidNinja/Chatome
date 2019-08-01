@@ -23,7 +23,7 @@ class LoginPage extends Component {
     event.preventDefault();
 
     var elms = document.querySelectorAll(
-        "#check1, #picture, #userLabel, #email, #password"
+        "#picture, #check1, #userLabel, #email, #password"
       ),
       returnLogs = null,
       myLoginData = {
@@ -47,6 +47,7 @@ class LoginPage extends Component {
         returnLogs !== null &&
         ["Login", "Register"].includes(returnLogs.checkInType)
       ) {
+        // console.log(returnLogs);
         Cookie("SET", { ...returnLogs });
         this.props.history.push("/chat");
       }
@@ -62,7 +63,7 @@ class LoginPage extends Component {
     if (userName.offsetHeight === 0) {
       userLabel.setAttribute("required", "required");
       alert(
-        "I see you want to Register,\n\n You can use a 'FAKE' Email or 'Username'. \n\nI will not collect any information that you provide beyond the use on this application. \n\n Cheers!"
+        "I see you want to Register,\n\n You can use a 'FAKE' Email or 'Username'. \n\nI will not collect any information that you provide beyond the use of this application. \n\n Cheers!"
       );
 
       // formgroup
