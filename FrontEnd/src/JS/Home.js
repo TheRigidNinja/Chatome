@@ -5,6 +5,7 @@ import "../CSS/Stories.css";
 import socket from "./Socket";
 // import { connect } from "react-redux";
 import MessagingBoard from "./MessageHandler/MessageBoard";
+import { recipientCallHandler } from "./MessageHandler/StreamingCalls";
 import LookUp from "./ProfileHandler/LookUp";
 import Chats from "./ProfileHandler/Chats";
 import Profile from "./ProfileHandler/Profile";
@@ -31,10 +32,10 @@ export class Home extends Component {
     messagingBoardStyle: "100%"
   };
 
-
-  componentDidUpdate(){
+  componentDidUpdate() {
     console.log("Updateded------------------->>>");
   }
+
   componentWillMount() {
     let keys = ["uuID", "checkInType"],
       cookieData = Cookie("GET", keys);
@@ -43,6 +44,7 @@ export class Home extends Component {
       keys = [
         "uuID",
         "status",
+        "picture",
         "checkInType",
         "messageKey",
         "phoneUpdate",
@@ -68,16 +70,30 @@ export class Home extends Component {
 
     // Triggers for other users if you go offline
     socket.on("UserOffline", ID => {
-      console.log(ID);
-      // var people = this.state.people;
+      var people = this.state.people;
 
-      // if (people) {
-      //   people[ID].status = "Offline";
-      //   this.setState({
-      //     people: people
-      //   });
-      // }
+      if (people.length >= 1) {
+        people[ID].status = "Offline";
+        this.setState({
+          people: people
+        });
+      }
     });
+    
+
+    // Works to check if use is still active 
+
+    setTimeout(()=>{
+      socket.emit("ActiveRoomsCheckIn", socket.id);
+    },3000)
+
+    console.log(socket.id);
+    setInterval(() => {
+      socket.emit("ActiveRoomsCheckIn", socket.id);
+    }, 1000 * 60);
+
+    // Gets ready the socket to listens for incoming calls
+    recipientCallHandler();
   }
 
   //----// Gets everyones profile data e.g name,pic, messages, etc...
@@ -134,6 +150,7 @@ export class Home extends Component {
           settingStyle: { display: "none" },
           messagingBoardStyle: "100%"
         });
+        document.querySelector(".SearchBar").style.display = "flex";
         break;
 
       case "People":
@@ -149,6 +166,7 @@ export class Home extends Component {
           settingStyle: { display: "none" },
           messagingBoardStyle: "100%"
         });
+        document.querySelector(".SearchBar").style.display = "flex";
         break;
 
       case "Profile":
@@ -163,6 +181,8 @@ export class Home extends Component {
           peopleStyle: { display: "none" },
           settingStyle: { display: "block" }
         });
+        document.querySelector(".SearchBar").style.display = "none";
+
         break;
 
       default:
@@ -289,13 +309,23 @@ export class Home extends Component {
 
             {/* Displays Stories for everyone*/}
             <div className="inboxSection" style={this.state.peopleStyle}>
-              <OnlinePeople togglePage={this.togglePage} />
+              <OnlinePeople
+                togglePage={this.togglePage}
+                people={this.state.people}
+                myDataID={this.state.myData.ID}
+              />
             </div>
 
             {/* Shows your profile */}
             <div className="YourProfileInfor" style={this.state.settingStyle}>
               <div className="myDetails">
-                <img src={this.state.myData.picture} id="userPicture" alt="IMG" />
+                <img
+                  style={{
+                    backgroundImage: "url(" + this.state.myData.picture + ")"
+                  }}
+                  id="userPicture"
+                  alt="IMG"
+                />
                 <span className="editImg">
                   <i className="fas fa-user-edit" />
                 </span>
@@ -337,7 +367,7 @@ export class Home extends Component {
           MSGstyle={this.state.messagingBoardStyle}
           togglePage={this.togglePage}
           myData={this.state.myData}
-          people = {this.state.people}
+          people={this.state.people}
           activeChatID={this.state.activeChatID}
         />
         <LookUp lookupType={this.state.lookupType} />

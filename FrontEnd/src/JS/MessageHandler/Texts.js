@@ -1,19 +1,24 @@
 import React from "react";
-import ReactHtmlParser from 'react-html-parser';
+import ReactHtmlParser from "react-html-parser";
 
 export default function Texts({ ChatData, myUserName, ImgSrc }) {
   const UserMessages = () => {
     if (ChatData) {
       return ChatData.map(msg => {
-        var userName = Object.keys(msg);
 
         // Replay Message Style
-        if (msg.name !== myUserName) {
+        if (msg.name  !== myUserName) {
           return (
-            <li className="replyMessage" key={myUserName + Math.random()}>
+            <li className="replyMessage" key={Math.random()}>
               <time>{msg.timeStamp}</time>
               <div>
-                <img src={ImgSrc} id="userIcon" alt="IMG" />
+                <img
+                  style={{
+                    backgroundImage: "url(" + ImgSrc + ")"
+                  }}
+                  id="userIcon"
+                  alt="IMG"
+                />
                 <label>{msg.name}</label>
                 <div>{ReactHtmlParser(msg.message)}</div>
               </div>
@@ -22,8 +27,9 @@ export default function Texts({ ChatData, myUserName, ImgSrc }) {
 
           // Sending message Style
         } else {
+    
           return (
-            <li className="sentMessage" key={userName + Math.random()}>
+            <li className="sentMessage" key={Math.random()}>
               <time>{msg.timeStamp}</time>
               <div>
                 <label>{msg.name}</label>

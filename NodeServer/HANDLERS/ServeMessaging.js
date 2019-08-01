@@ -9,7 +9,6 @@ async function serverMessaging(clientsData) {
     msgKeyStore[clientsData.uuID].push(...clientsData.friends);
   }
 
-
   // Gets the chats messaging Data using Massage Keys
   for (const key of msgKeyStore[clientsData.uuID]) {
     var dbType = { db: "MSGChannel", dbTable: key };
@@ -26,7 +25,7 @@ async function serverMessaging(clientsData) {
   return tempChats;
 }
 // --- // Sending messages in the DB
-async function sendMessage(clientsData, key, recipient) {
+async function sendMessage(clientsData, key, myName) {
   var messageKey = clientsData.messageKey,
     uuID = clientsData.uuID,
     checkInType = clientsData.checkInType,
@@ -67,14 +66,14 @@ async function sendMessage(clientsData, key, recipient) {
 
   if (msgKeyExists) {
     console.log("Now firends!!!!! !!!");
-    var dbType = { db: "Friends", dbTable: recipient.friend };
+    var dbType = { db: "Friends", dbTable: clientsData.name };
     msgData = await dataBase.dataBaseHandler(
       { [messageKey]: "", checkInType: "Register" },
       dbType
     );
 
     // My key
-    var dbType = { db: "Friends", dbTable: recipient.me };
+    var dbType = { db: "Friends", dbTable: myName };
     msgData = await dataBase.dataBaseHandler(
       { [messageKey]: "", checkInType: "Register" },
       dbType

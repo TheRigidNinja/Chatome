@@ -265,6 +265,10 @@ export default class ProfilePic extends Component {
               title="Choose your avatar"
               id="picture"
               style={this.props.imgStyle}
+              // style={{
+              //   ...this.props.imgStyle
+              //   backgroundImage: "url(" + this.state.profilePic + ")"
+              // }}
             />
           </>
         );

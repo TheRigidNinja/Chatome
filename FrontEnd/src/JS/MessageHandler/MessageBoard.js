@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import "../../CSS/Messaging.css";
-import "../../CSS/PhoneCall.css";
 import "../../CSS/TextArea.css";
-import StreamingCalls from "./StreamingCalls";
 import socket from "../Socket";
 import Texts from "./Texts";
 import { connect } from "react-redux";
@@ -65,7 +63,7 @@ export class MessageBoard extends Component {
         },
         () => {
           // Get latest MSG
-          // this.handleLastChats("GetInitialMSG");
+          this.handleLastChats("GetInitialMSG");
         }
       );
     });
@@ -84,11 +82,13 @@ export class MessageBoard extends Component {
         message: msgTextarea.value,
         checkInType: "Register",
         messageKey: checkKey,
-        name: friendGroup.me,
-        recipient: friendGroup.friend,
+
         uuID: this.props.myData.uuID,
-        timeStamp: Date.parse(new Date())
+        timeStamp: Date.parse(new Date()),
+        name: friendGroup.me
       };
+
+    console.log(friendGroup);
 
     // Makes sure MSG box is not empty
     if (
@@ -97,7 +97,8 @@ export class MessageBoard extends Component {
     ) {
       // ----- // Sends Message to the server Here
       console.log("Sending");
-      // socket.emit("SendMessage", userMSGForm, userMSGForm.uuID, recipientName);
+
+      socket.emit("SendMessage", userMSGForm, userMSGForm.uuID, friendGroup.friend);
 
       delete userMSGForm.uuID;
       delete userMSGForm.messageKey;
@@ -116,176 +117,120 @@ export class MessageBoard extends Component {
         () => {
           msgTextarea.value = "";
           // Get latest MSG
-          // this.handleLastChats("GetLocalMSG");
+
+          this.handleLastChats("GetLocalMSG");
         }
       );
+
     }
   };
 
-  // // ----- // Gets any messages from friends of people wanting to be friends
-  // getFriendMessage = myDetail => {
-  //   socket.emit("UserDetails", myDetail);
+  // ----- // Gets any messages from friends of people wanting to be friends
+  getFriendMessage = myDetail => {
+    socket.emit("UserDetails", myDetail);
 
-  //   socket.on(myDetail.roomID, res => {
-  //     let recipientData = res.messageKey;
+    // console.log(object);
+    socket.on(myDetail.roomID, res => {
+      console.log("Active");
+      let recipientData = res.messageKey;
 
-  //     if (recipientData) {
-  //       let myID = this.props.inboxState.myDataID,
-  //         myMSGkey = this.props.inboxState.people[myID].messageKey,
-  //         recipientKey = recipientData.replace(myMSGkey, ""),
-  //         key1 = recipientKey + myMSGkey,
-  //         key2 = myMSGkey + recipientKey,
-  //         localMsg1 = this.state.myMSGRoom[key1],
-  //         localMsg2 = this.state.myMSGRoom[key2],
-  //         localMSGDATA = [],
-  //         checkKey = "",
-  //         globalMSGDATA = this.state.chatRooms[recipientData];
-  //       globalMSGDATA = globalMSGDATA ? globalMSGDATA : [];
+      if (recipientData) {
+        let myData = this.props.myData,
+          myMSGkey = myData.messageKey,
+          recipientKey = recipientData.replace(myMSGkey, ""),
+          key1 = recipientKey + myMSGkey,
+          key2 = myMSGkey + recipientKey,
+          localMsg1 = this.state.myMSGRoom[key1],
+          localMsg2 = this.state.myMSGRoom[key2],
+          localMSGDATA = [],
+          checkKey = "",
+          globalMSGDATA = this.state.chatRooms[recipientData];
+        globalMSGDATA = globalMSGDATA ? globalMSGDATA : [];
 
-  //       // Checking for local MSG KEY
-  //       if (localMsg1) {
-  //         localMSGDATA = localMsg1;
-  //         checkKey = key1;
-  //       } else if (localMsg2) {
-  //         localMSGDATA = localMsg2;
-  //         checkKey = key2;
-  //       }
+        // Checking for local MSG KEY
+        if (localMsg1) {
+          localMSGDATA = localMsg1;
+          checkKey = key1;
+        } else if (localMsg2) {
+          localMSGDATA = localMsg2;
+          checkKey = key2;
+        }
 
-  //       delete res.uuID;
-  //       delete res.messageKey;
-  //       delete res.checkInType;
+        delete res.uuID;
+        delete res.messageKey;
+        delete res.checkInType;
 
-  //       this.setState(
-  //         {
-  //           chatRooms: {
-  //             ...this.state.chatRooms,
-  //             [recipientData]: [...globalMSGDATA, ...localMSGDATA, res]
-  //           },
-  //           myMSGRoom: {
-  //             ...this.state.myMSGRoom,
-  //             [checkKey]: []
-  //           }
-  //         },
-  //         () => {
-  //           // Get latest MSG
-  //           this.handleLastChats("GetFriendsMSG");
-  //         }
-  //       );
-  //     }
-  //   });
-  // };
+        this.setState(
+          {
+            chatRooms: {
+              ...this.state.chatRooms,
+              [recipientData]: [...globalMSGDATA, ...localMSGDATA, res]
+            },
+            myMSGRoom: {
+              ...this.state.myMSGRoom,
+              [checkKey]: []
+            }
+          },
+          () => {
+            // Get latest MSG
+            this.handleLastChats("GetFriendsMSG");
+          }
+        );
+      }
+    });
+  };
 
-  // // ----- // Handles Getting latest Chat messages and push them to props for people section
-  // handleLastChats = ActionType => {
-  //   var lastChats = {},
-  //     inboxState = this.props.inboxState,
-  //     myName = inboxState.people[inboxState.myDataID].userName,
-  //     roomType = ["GetFriendsMSG", "GetInitialMSG"].includes(ActionType)
-  //       ? "chatRooms"
-  //       : "myMSGRoom";
+  // ----- // Handles Getting latest Chat messages and push them to props for people section
+  handleLastChats = ActionType => {
+    // var lastChats = {},
+    //   inboxState = this.props.inboxState,
+    //   myName = inboxState.people[inboxState.myDataID].userName,
+    //   roomType = ["GetFriendsMSG", "GetInitialMSG"].includes(ActionType)
+    //     ? "chatRooms"
+    //     : "myMSGRoom";
 
-  //   for (const msgKey of Object.keys(this.state[roomType])) {
-  //     let msg = this.state[roomType][msgKey],
-  //       lastMSG = msg[msg.length - 1];
-  //     if (
-  //       lastMSG &&
-  //       (lastMSG.recipient === myName || lastMSG.name === myName)
-  //     ) {
-  //       let nameSort =
-  //         lastMSG.recipient === myName ? lastMSG.name : lastMSG.recipient;
-  //       lastChats[nameSort] = lastMSG;
-  //     }
-  //   }
+    // for (const msgKey of Object.keys(this.state[roomType])) {
+    //   let msg = this.state[roomType][msgKey],
+    //     lastMSG = msg[msg.length - 1];
+    //   if (
+    //     lastMSG &&
+    //     (lastMSG.recipient === myName || lastMSG.name === myName)
+    //   ) {
+    //     let nameSort =
+    //       lastMSG.recipient === myName ? lastMSG.name : lastMSG.recipient;
+    //     lastChats[nameSort] = lastMSG;
+    //   }
+    // }
 
-  //   switch (ActionType) {
-  //     case "GetInitialMSG":
-  //       this.props.latestChats(lastChats);
+    switch (ActionType) {
+      case "GetInitialMSG":
+        // this.props.latestChats(lastChats);
 
-  //       // Triggering friends function to send roomID to server so i can keep track who is who
-  //       var myID = inboxState.myDataID,
-  //         myDetail = {
-  //           myName: inboxState.people[myID].userName,
-  //           roomID: socket.id,
-  //           id: myID,
-  //           uuID: Cookie("GET", ["uuID"])[0]
-  //         };
+        // Triggering friends function to send roomID to server so i can keep track who is who
 
-  //       this.getFriendMessage(myDetail);
-  //       break;
+        var myData = this.props.myData,
+          myDetail = {
+            myName: myData.userName,
+            roomID: socket.id,
+            id: myData.ID,
+            uuID: myData.uuID
+          };
 
-  //     default:
-  //       // Clear Text Area After setting to state
-  //       if (document.querySelector(".MSGBox")) {
-  //         document.querySelector(".MSGBox").innerHTML = "";
-  //       }
-
-  //       this.props.latestChats({
-  //         ...this.props.profileDetails.latestChats,
-  //         ...lastChats
-  //       });
-  //   }
-  // };
-
-  // ----- // Handles Video or Audio Call Actions
-  HandlePhoneCall = (type, details) => {
-    let myCanvasVideo = document.querySelector("#myCanvasVideo"),
-      ControlCont = document.querySelector(".ControlCont"),
-      ButtonsCont = document.querySelector(".ButtonsCont"),
-      PhoneProfile = document.querySelector(".PhoneProfile"),
-      Controls = document.querySelector(".Controls"),
-      endCall = document.querySelector(".endCall"),
-      videoToggle = document.querySelector("#videoToggle");
-
-    if (type === "videoToggle") {
-      type = videoToggle.classList[0] === "ActiveCall" ? "phone" : "video";
-    }
-
-    switch (type) {
-      case "phone":
-        myCanvasVideo.classList.remove("activeCallShow");
-        ControlCont.classList.remove("activeCallFlexEnd");
-        ButtonsCont.classList.remove("activeCallHeight");
-        PhoneProfile.classList.remove("activeCallHide");
-        Controls.classList.remove("activeCallJustify");
-        endCall.classList.remove("activeCallMargin");
-        videoToggle.classList.remove("ActiveCall");
-        break;
-
-      case "video":
-        myCanvasVideo.classList.add("activeCallShow");
-        ControlCont.classList.add("activeCallFlexEnd");
-        ButtonsCont.classList.add("activeCallHeight");
-        PhoneProfile.classList.add("activeCallHide");
-        Controls.classList.add("activeCallJustify");
-        endCall.classList.add("activeCallMargin");
-        videoToggle.classList.add("ActiveCall");
+        this.getFriendMessage(myDetail);
         break;
 
       default:
-    }
 
-    // Actually Starts the Action Audio or Video transmition
-    StreamingCalls(type, details);
+      // Clear Text Area After setting to state
+      // if (document.querySelector(".MSGBox")) {
+      //   document.querySelector(".MSGBox").innerHTML = "";
+      // }
 
-    if (this.state.PhoneCallStyle.display === "none" || type === "MSG") {
-      let displayType1 =
-          this.state.PhoneCallStyle.display === "none"
-            ? { opacity: 0, display: "block" }
-            : { opacity: 0, display: "block" },
-        displayType2 =
-          this.state.PhoneCallStyle.display === "none"
-            ? { opacity: 1, display: "block" }
-            : { opacity: 0, display: "none" };
+      // this.props.latestChats({
+      //   ...this.props.profileDetails.latestChats,
+      //   ...lastChats
+      // });
 
-      this.setState({
-        PhoneCallStyle: displayType1
-      });
-
-      setTimeout(() => {
-        this.setState({
-          PhoneCallStyle: displayType2
-        });
-      }, 100);
     }
   };
 
@@ -293,28 +238,23 @@ export class MessageBoard extends Component {
     let main = document.querySelector(".InsertImage"),
       arrow = main.querySelector(".fa-chevron-right"),
       icons = main.querySelector(".optionIcons");
-    // gallery = main.querySelector(".fa-mountain"),
-    // upload = main.querySelector(".fa-image"),
-    // photo = main.querySelector(".fa-camera-retro");
 
     if (text.length > 0 && arrow.classList[2] === "iconToggle") {
       arrow.classList.remove("iconToggle");
       icons.classList.add("iconToggle");
-      // upload.classList.add("iconToggle");
-      // photo.classList.add("iconToggle");
     } else if (text.length === 0) {
       arrow.classList.add("iconToggle");
       icons.classList.remove("iconToggle");
-      // upload.classList.remove("iconToggle");
-      // photo.classList.remove("iconToggle");
     }
 
     // console.log((height / 35) * 35, this.state.textareaHght.height);
     if (height > this.state.textareaHght.height) {
+
+      
       // this.setState({
       //   textareaHght:{height: height}
       // })
-    }
+    }console.log(height);
 
     // console.log((8.5*text.length)/width, count,width);
   };
@@ -322,9 +262,12 @@ export class MessageBoard extends Component {
   render() {
     let people = this.props.people,
       activeChatID = this.props.activeChatID,
-      userName = activeChatID ? people[activeChatID].userName : "",
-      picture = activeChatID ? people[activeChatID].picture : "",
-      friendsMSGkey = activeChatID ? people[activeChatID].messageKey : "",
+      userName =
+        typeof activeChatID === "number" ? people[activeChatID].userName : "",
+      picture =
+        typeof activeChatID === "number" ? people[activeChatID].picture : "-",
+      friendsMSGkey =
+        typeof activeChatID === "number" ? people[activeChatID].messageKey : "",
       myData = this.props.myData,
       myUserName = myData.userName,
       myMSGkey = myData.messageKey,
@@ -333,7 +276,7 @@ export class MessageBoard extends Component {
       checkKey = this.state.chatRooms[key1] ? key1 : key2,
       myChats = this.state.myMSGRoom[key2],
       messageData = this.state.chatRooms[checkKey];
-
+    // console.log(key1, activeChatID);
     // Puts "|" in the middle of the messagekey so we can search if that perticular key
     // exists in mySQL table
     if (!messageData) {
@@ -343,6 +286,7 @@ export class MessageBoard extends Component {
             ? myMSGkey + "|" + tempKey1[1]
             : tempKey1[1] + "|" + myMSGkey;
       checkKey = tempKey2;
+
       messageData = [];
     }
 
@@ -378,21 +322,23 @@ export class MessageBoard extends Component {
             <div className="header2">
               <i
                 className="fas fa-phone"
-                onClick={() =>
-                  this.HandlePhoneCall("phone", {
-                    me: myUserName,
-                    friend: userName
-                  })
-                }
+
+                // onClick={() =>
+                //   this.HandlePhoneCall("phone", {
+                //     me: myUserName,
+                //     friend: userName
+                //   })
+                // }
               />
               <i
                 className="fas fa-video"
-                onClick={() =>
-                  this.HandlePhoneCall("video", {
-                    me: myUserName,
-                    friend: userName
-                  })
-                }
+                // onClick={() =>
+                //   this.HandlePhoneCall("video", {
+                //     me: myUserName,
+                //     friend: userName
+                //   })
+                // }
+
               />
             </div>
           </div>
@@ -479,12 +425,14 @@ export class MessageBoard extends Component {
                   <label>Speaker</label>
                 </span>
                 <span
-                  onClick={event =>
-                    this.HandlePhoneCall("videoToggle", {
-                      me: myUserName,
-                      friend: userName
-                    })
-                  }
+
+                  // onClick={event =>
+                  //   this.HandlePhoneCall("videoToggle", {
+                  //     me: myUserName,
+                  //     friend: userName
+                  //   })
+                  // }
+
                   id="videoToggle"
                   className=""
                 >
@@ -495,12 +443,14 @@ export class MessageBoard extends Component {
 
               <div className="endCall">
                 <span
-                  onClick={() =>
-                    this.HandlePhoneCall("MSG", {
-                      me: myUserName,
-                      friend: userName
-                    })
-                  }
+
+                  // onClick={() =>
+                  //   this.HandlePhoneCall("MSG", {
+                  //     me: myUserName,
+                  //     friend: userName
+                  //   })
+                  // }
+
                 >
                   <i className="fas fa-phone" />
                 </span>

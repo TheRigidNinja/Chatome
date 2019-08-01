@@ -1,3 +1,4 @@
+import React, { Component } from "react";
 import WebCam from "../WebCam";
 import socket from "../Socket";
 
@@ -21,20 +22,18 @@ export default function StreamingCalls(type, details) {
     WebCam(type, myVideo, myCanvasVideo);
   } else {
     // Starts stream videos to server
-    const imgURL = myCanvasVideo.toDataURL("image/jpeg", 0.5);
-    socket.emit("GetStream", imgURL, details);
+
+    // const imgURL = myCanvasVideo.toDataURL("image/jpeg", 0.5);
+    // socket.emit("GetStream", imgURL, details);
+
 
     // this is just a test to see if this will work
   }
 }
 
-
-
-
 // This is a place where you get to see the recipientVideo / Audio
-
-function recipientHandler() {
+export function recipientCallHandler() {
   socket.on("GetStreamData", streamData => {
-
+    
   });
 }
